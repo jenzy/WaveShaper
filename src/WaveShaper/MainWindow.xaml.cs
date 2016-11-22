@@ -1,17 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows;
+using NAudio.Wave;
 
 namespace WaveShaper
 {
@@ -20,9 +8,44 @@ namespace WaveShaper
     /// </summary>
     public partial class MainWindow : Window
     {
+        private WaveSample inputSamples;
+        private WaveOut waveOut;
+
+
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        
+    }
+
+    class Prov : WaveProvider32
+    {
+        private readonly float[] samples;
+
+        public Prov(WaveSample waveSample)
+        {
+            samples = waveSample.Samples;
+            SetWaveFormat(waveSample.WaveFormat.SampleRate, waveSample.WaveFormat.Channels);
+        }
+
+        public int Position { get; set; }
+
+        public override int Read(float[] buffer, int offset, int sampleCount)
+        {
+            if (Position >= samples.Length)
+                return 0;
+
+            for (int i = 0; i < sampleCount; i++)
+            {
+                buffer[i + offset] = samples[Position];
+
+                if (++Position >= samples.Length)
+                    return i + 1;
+            }
+
+            return sampleCount;
         }
     }
 }
