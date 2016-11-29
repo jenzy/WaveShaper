@@ -29,6 +29,12 @@ namespace WaveShaper.Controls
             timer.Start();
         }
 
+        public Func<double, double> ShapingFunction
+        {
+            get { return samplesProvider.ShapingFunction; }
+            set { samplesProvider.ShapingFunction = value; }
+        }
+
         private void Timer_Tick(object sender, EventArgs e)
         {
             if (waveOut == null)

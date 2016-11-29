@@ -5,9 +5,77 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WaveShaper"
         xmlns:controls="clr-namespace:WaveShaper.Controls"
+        xmlns:utils="clr-namespace:WaveShaper.Utilities"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="WaveShaper" Height="436.039" Width="634.489">
+        Title="WaveShaper" Height="436.039" Width="634.489"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}">
+    <Window.Resources>
+        <!--<utils:WpfEnumDisplayConverter x:Key="myEnumConverter"/>-->
+        <ObjectDataProvider x:Key="DpProcessingTypes" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:ProcessingType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="DpOperaotor" MethodName="AllValuesForDdl" ObjectType="utils:EnumUtil">
+            <ObjectDataProvider.MethodParameters>
+                <x:TypeExtension TypeName="local:Operator" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </Window.Resources>
     <Grid>
-        <controls:Player Margin="10,10,10,10" VerticalAlignment="Top" />
+        <controls:Player Margin="10,10,10,10" VerticalAlignment="Top" x:Name="Player"/>
+        <GroupBox Header="Waveshaper" Margin="10,64,10,10">
+            <Grid>
+                <StackPanel Orientation="Horizontal" Margin="10,10,0,0" HorizontalAlignment="Left"  VerticalAlignment="Top">
+                    <ComboBox x:Name="DdlProcessingType" 
+                          ItemsSource="{Binding Source={StaticResource DpProcessingTypes}}"
+                          SelectedIndex="0" IsSynchronizedWithCurrentItem="True"
+                          SelectionChanged="DdlProcessingType_OnSelectionChanged" Width="150" />
+                    <Button x:Name="button" Content="Apply" HorizontalAlignment="Left" Width="60" Margin="10,0,0,0" 
+                            Click="Button_OnClick"/>
+                </StackPanel>
+                <TabControl x:Name="TabControl" HorizontalAlignment="Left" Height="262" Margin="10,37,0,0" VerticalAlignment="Top" Width="574"
+                            SelectedIndex="{Binding SelectedIndex, ElementName=DdlProcessingType}">
+                    <TabControl.ItemContainerStyle>
+                        <Style TargetType="{x:Type TabItem}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </Style>
+                    </TabControl.ItemContainerStyle>
+                    <TabItem Header="TabItem">
+                        <Grid/>
+                    </TabItem>
+                    <TabItem Header="TabItem">
+                        <Grid>
+                            <DataGrid x:Name="dataGrid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                                      Margin="0,0,0,0" Height="Auto" Width="Auto"
+                                      CanUserAddRows="True"
+                                      CanUserDeleteRows="True"
+                                      AutoGenerateColumns="False"
+                                      ItemsSource="{Binding Items, Mode=TwoWay}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding From, StringFormat='{}{0:0.####}'}" MinWidth="50"/>
+                                    <DataGridComboBoxColumn ItemsSource="{Binding Source={StaticResource DpOperaotor}}"
+                                                            SelectedValueBinding="{Binding FromOperator}"
+                                                            DisplayMemberPath="Text" SelectedValuePath="Value">
+                                    </DataGridComboBoxColumn>
+                                    <DataGridTextColumn Binding="{Binding VariableDisplay}" IsReadOnly="True" />
+                                    <DataGridComboBoxColumn ItemsSource="{Binding Source={StaticResource DpOperaotor}}"
+                                                            SelectedValueBinding="{Binding ToOperator}"
+                                                            DisplayMemberPath="Text" SelectedValuePath="Value">
+                                    </DataGridComboBoxColumn>
+                                    <DataGridTextColumn Binding="{Binding To, StringFormat='{}{0:0.####}'}" MinWidth="50"/>
+                                    <DataGridTextColumn Header="f(x)" Binding="{Binding Expression}" Width="200*" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+
+            </Grid>
+        </GroupBox>
     </Grid>
 </Window>
+
+
+

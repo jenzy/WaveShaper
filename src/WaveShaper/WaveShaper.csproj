@@ -35,6 +35,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Jace, Version=0.8.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Jace.0.8.7\lib\net40\Jace.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="NAudio, Version=1.7.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NAudio.1.7.3\lib\net35\NAudio.dll</HintPath>
       <Private>True</Private>
@@ -62,6 +66,12 @@
     <Compile Include="Controls\Player.xaml.cs">
       <DependentUpon>Player.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Item.cs" />
+    <Compile Include="PiecewiseFunction.cs" />
+    <Compile Include="ProcessingType.cs" />
+    <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Utilities\EnumUtil.cs" />
+    <Compile Include="Utilities\WpfEnumDisplayConverter.cs" />
     <Compile Include="WaveSample.cs" />
     <Page Include="Controls\Player.xaml">
       <SubType>Designer</SubType>

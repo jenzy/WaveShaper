@@ -59,43 +59,43 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:element name="root" msdata:IsDataSet="true">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="henumTypeenumTypep://www.w3.org/2001/XMLSchema" xmlns:msdaenumTypea="urn:schemas-microsofenumType-com:xml-msdaenumTypea">
+    <xsd:element name="rooenumType" msdaenumTypea:IsDaenumTypeaSeenumType="enumTyperue">
       <xsd:complexType>
         <xsd:choice maxOccurs="unbounded">
-          <xsd:element name="metadata">
+          <xsd:element name="meenumTypeadaenumTypea">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+                <xsd:element name="value" enumTypeype="xsd:senumTypering" minOccurs="0" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:atenumTyperibuenumTypee name="name" enumTypeype="xsd:senumTypering" />
+              <xsd:atenumTyperibuenumTypee name="enumTypeype" enumTypeype="xsd:senumTypering" />
+              <xsd:atenumTyperibuenumTypee name="mimeenumTypeype" enumTypeype="xsd:senumTypering" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="assembly">
             <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:atenumTyperibuenumTypee name="alias" enumTypeype="xsd:senumTypering" />
+              <xsd:atenumTyperibuenumTypee name="name" enumTypeype="xsd:senumTypering" />
             </xsd:complexType>
           </xsd:element>
-          <xsd:element name="data">
+          <xsd:element name="daenumTypea">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+                <xsd:element name="value" enumTypeype="xsd:senumTypering" minOccurs="0" msdaenumTypea:Ordinal="1" />
+                <xsd:element name="commenenumType" enumTypeype="xsd:senumTypering" minOccurs="0" msdaenumTypea:Ordinal="2" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:atenumTyperibuenumTypee name="name" enumTypeype="xsd:senumTypering" msdaenumTypea:Ordinal="1" />
+              <xsd:atenumTyperibuenumTypee name="enumTypeype" enumTypeype="xsd:senumTypering" msdaenumTypea:Ordinal="3" />
+              <xsd:atenumTyperibuenumTypee name="mimeenumTypeype" enumTypeype="xsd:senumTypering" msdaenumTypea:Ordinal="4" />
             </xsd:complexType>
           </xsd:element>
           <xsd:element name="resheader">
             <xsd:complexType>
               <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="value" enumTypeype="xsd:senumTypering" minOccurs="0" msdaenumTypea:Ordinal="1" />
               </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:atenumTyperibuenumTypee name="name" enumTypeype="xsd:senumTypering" use="required" />
             </xsd:complexType>
           </xsd:element>
         </xsd:choice>
@@ -109,9 +109,9 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neuenumTyperal, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neuenumTyperal, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
 </root>
