@@ -11,13 +11,13 @@
         Title="WaveShaper" Height="436.039" Width="634.489"
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Window.Resources>
-        <!--<utils:WpfEnumDisplayConverter x:Key="myEnumConverter"/>-->
-        <ObjectDataProvider x:Key="DpProcessingTypes" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+        <!--<utils:WpfEnumDisplayConverter x:Key="EnumConverter"/>-->
+        <ObjectDataProvider x:Key="DpProcessingTypes" MethodName="AllValuesForDdl" ObjectType="utils:EnumUtil">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:ProcessingType"/>
+                <x:TypeExtension TypeName="local:ProcessingType" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
-        <ObjectDataProvider x:Key="DpOperaotor" MethodName="AllValuesForDdl" ObjectType="utils:EnumUtil">
+        <ObjectDataProvider x:Key="DpOperator" MethodName="AllValuesForDdl" ObjectType="utils:EnumUtil">
             <ObjectDataProvider.MethodParameters>
                 <x:TypeExtension TypeName="local:Operator" />
             </ObjectDataProvider.MethodParameters>
@@ -29,13 +29,13 @@
             <Grid>
                 <StackPanel Orientation="Horizontal" Margin="10,10,0,0" HorizontalAlignment="Left"  VerticalAlignment="Top">
                     <ComboBox x:Name="DdlProcessingType" 
-                          ItemsSource="{Binding Source={StaticResource DpProcessingTypes}}"
+                          ItemsSource="{Binding Source={StaticResource DpProcessingTypes}}"  DisplayMemberPath="Text" SelectedValuePath="Value"
                           SelectedIndex="0" IsSynchronizedWithCurrentItem="True"
                           SelectionChanged="DdlProcessingType_OnSelectionChanged" Width="150" />
                     <Button x:Name="button" Content="Apply" HorizontalAlignment="Left" Width="60" Margin="10,0,0,0" 
                             Click="Button_OnClick"/>
                 </StackPanel>
-                <TabControl x:Name="TabControl" HorizontalAlignment="Left" Height="262" Margin="10,37,0,0" VerticalAlignment="Top" Width="574"
+                <TabControl x:Name="TabControl" Margin="10,37,10,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" 
                             SelectedIndex="{Binding SelectedIndex, ElementName=DdlProcessingType}">
                     <TabControl.ItemContainerStyle>
                         <Style TargetType="{x:Type TabItem}">
@@ -46,25 +46,71 @@
                         <Grid/>
                     </TabItem>
                     <TabItem Header="TabItem">
-                        <Grid>
-                            <DataGrid x:Name="dataGrid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                        <Grid >
+                            <DataGrid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                                       Margin="0,0,0,0" Height="Auto" Width="Auto"
-                                      CanUserAddRows="True"
-                                      CanUserDeleteRows="True"
-                                      AutoGenerateColumns="False"
-                                      ItemsSource="{Binding Items, Mode=TwoWay}">
+                                      CanUserAddRows="True" CanUserDeleteRows="True" AutoGenerateColumns="False"
+                                      ItemsSource="{Binding PiecewiseFunctionRows, Mode=TwoWay}">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Binding="{Binding From, StringFormat='{}{0:0.####}'}" MinWidth="50"/>
-                                    <DataGridComboBoxColumn ItemsSource="{Binding Source={StaticResource DpOperaotor}}"
-                                                            SelectedValueBinding="{Binding FromOperator}"
-                                                            DisplayMemberPath="Text" SelectedValuePath="Value">
+                                    <DataGridTextColumn Binding="{Binding From, StringFormat='{}{0:0.0###}'}" MinWidth="50">
+                                        <DataGridTextColumn.EditingElementStyle>
+                                            <Style>
+                                                <Setter Property="TextBox.TextAlignment" Value="Right" />
+                                            </Style>
+                                        </DataGridTextColumn.EditingElementStyle>
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style>
+                                                <Setter Property="TextBlock.TextAlignment" Value="Right" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridComboBoxColumn ItemsSource="{Binding Source={StaticResource DpOperator}}"
+                                                            SelectedValueBinding="{Binding FromOperator}" DisplayMemberPath="Text" SelectedValuePath="Value"
+                                                            MinWidth="50">
+                                        <DataGridComboBoxColumn.EditingElementStyle>
+                                            <Style>
+                                                <Setter Property="ComboBox.MinWidth" Value="45" />
+                                            </Style>
+                                        </DataGridComboBoxColumn.EditingElementStyle>
+                                        <DataGridComboBoxColumn.ElementStyle>
+                                            <Style>
+                                                <Setter Property="TextBlock.HorizontalAlignment" Value="Center" />
+                                            </Style>
+                                        </DataGridComboBoxColumn.ElementStyle>
                                     </DataGridComboBoxColumn>
-                                    <DataGridTextColumn Binding="{Binding VariableDisplay}" IsReadOnly="True" />
-                                    <DataGridComboBoxColumn ItemsSource="{Binding Source={StaticResource DpOperaotor}}"
-                                                            SelectedValueBinding="{Binding ToOperator}"
-                                                            DisplayMemberPath="Text" SelectedValuePath="Value">
+                                    <DataGridTextColumn Binding="{Binding VariableDisplay}" IsReadOnly="True">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style>
+                                                <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridComboBoxColumn ItemsSource="{Binding Source={StaticResource DpOperator}}"
+                                                            SelectedValueBinding="{Binding ToOperator}" DisplayMemberPath="Text" SelectedValuePath="Value"
+                                                            MinWidth="50">
+                                        <DataGridComboBoxColumn.EditingElementStyle>
+                                            <Style>
+                                                <Setter Property="ComboBox.MinWidth" Value="45" />
+                                            </Style>
+                                        </DataGridComboBoxColumn.EditingElementStyle>
+                                        <DataGridComboBoxColumn.ElementStyle>
+                                            <Style>
+                                                <Setter Property="TextBlock.HorizontalAlignment" Value="Center" />
+                                            </Style>
+                                        </DataGridComboBoxColumn.ElementStyle>
                                     </DataGridComboBoxColumn>
-                                    <DataGridTextColumn Binding="{Binding To, StringFormat='{}{0:0.####}'}" MinWidth="50"/>
+                                    <DataGridTextColumn Binding="{Binding To, StringFormat='{}{0:0.0###}'}" MinWidth="50">
+                                        <DataGridTextColumn.EditingElementStyle>
+                                            <Style>
+                                                <Setter Property="TextBox.TextAlignment" Value="Right" />
+                                            </Style>
+                                        </DataGridTextColumn.EditingElementStyle>
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style>
+                                                <Setter Property="TextBlock.TextAlignment" Value="Right" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
                                     <DataGridTextColumn Header="f(x)" Binding="{Binding Expression}" Width="200*" />
                                 </DataGrid.Columns>
                             </DataGrid>

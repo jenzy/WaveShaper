@@ -6,6 +6,7 @@ using System.Windows.Threading;
 using Microsoft.Win32;
 using NAudio.Utils;
 using NAudio.Wave;
+using WaveShaper.Utilities;
 
 namespace WaveShaper.Controls
 {
@@ -16,7 +17,8 @@ namespace WaveShaper.Controls
     {
         private WaveSample inputSamples;
         private WaveOut waveOut;
-        private Prov samplesProvider;
+        private ShapingSampleProvider samplesProvider;
+        private Func<double, double> shapingFunction;
 
         public Player()
         {
@@ -32,7 +34,12 @@ namespace WaveShaper.Controls
         public Func<double, double> ShapingFunction
         {
             get { return samplesProvider.ShapingFunction; }
-            set { samplesProvider.ShapingFunction = value; }
+            set
+            {
+                shapingFunction = value;
+                if (samplesProvider != null)
+                    samplesProvider.ShapingFunction = value;
+            }
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -55,36 +62,36 @@ namespace WaveShaper.Controls
             if (openFileDialog.ShowDialog() != true)
                 return;
 
-            var afr = new AudioFileReader(openFileDialog.FileName);
-            var samples = new float[afr.Length / (afr.WaveFormat.BitsPerSample / 8)];
-
-            const int bufSize = 1024;
-            int offset = 0;
-            while (true)
+            using (new WaitCursor())
             {
-                int sampleCount = Math.Min(bufSize, samples.Length - offset);
-                int read = afr.Read(samples, offset, sampleCount);
-                offset += read;
-                if (read <= 0)
-                    break;
-            }
+                var afr = new AudioFileReader(openFileDialog.FileName);
+                var samples = new float[afr.Length / (afr.WaveFormat.BitsPerSample / 8)];
 
-            inputSamples = new WaveSample(samples, afr.WaveFormat);
-            LblFileTitle.Content = openFileDialog.FileName;
-            SetLabelTime(TimeSpan.Zero, inputSamples.TimeSpanLength);
+                const int bufSize = 1024 * 1024;
+                int offset = 0;
+                while (true)
+                {
+                    int sampleCount = Math.Min(bufSize, samples.Length - offset);
+                    int read = afr.Read(samples, offset, sampleCount);
+                    offset += read;
+                    if (read <= 0)
+                        break;
+                }
+
+                inputSamples = new WaveSample(samples, afr.WaveFormat);
+                LblFileTitle.Content = openFileDialog.FileName;
+                SetLabelTime(TimeSpan.Zero, inputSamples.TimeSpanLength);
+
+                samplesProvider = new ShapingSampleProvider(inputSamples, shapingFunction);
+                waveOut = new WaveOut();
+                waveOut.Init(samplesProvider);
+            }
         }
 
         private void BtnPlay_OnClick(object sender, RoutedEventArgs e)
         {
             if (BtnPlay.IsChecked == null || inputSamples == null)
                 return;
-
-            if (waveOut == null)
-            {
-                samplesProvider = new Prov(inputSamples);
-                waveOut = new WaveOut();
-                waveOut.Init(samplesProvider);
-            }
 
             if (BtnPlay.IsChecked.Value)
                 waveOut.Play();

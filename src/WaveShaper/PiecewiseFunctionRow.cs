@@ -14,14 +14,13 @@ namespace WaveShaper
         LessOrEqualThan
     }
 
-    public class Item : INotifyPropertyChanged
+    public class PiecewiseFunctionRow : INotifyPropertyChanged
     {
         private Operator toOperator;
         private double? to;
         private Operator fromOperator;
         private double? from;
         private string expression;
-
 
         public double? From
         {
@@ -78,8 +77,7 @@ namespace WaveShaper
             }
         }
 
-        public string VariableDisplay => "x"; //(To != null || From != null) ? "x" : null;
-
+        public string VariableDisplay => "x";
 
         public Predicate<double> GetCondition()
         {

@@ -1,9 +1,13 @@
-﻿namespace WaveShaper
+﻿using System.ComponentModel;
+
+namespace WaveShaper
 {
     public enum ProcessingType
     {
-        None,
+        [Description("No processing")]
+        NoProcessing,
 
-        Piecewise
+        [Description("Piecewise function")]
+        PiecewiseFunction
     }
 }
