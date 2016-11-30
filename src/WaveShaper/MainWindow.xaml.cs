@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using Jace;
+using OxyPlot;
+using OxyPlot.Axes;
+using OxyPlot.Series;
 using WaveShaper.Annotations;
+using WaveShaper.Utilities;
 
 namespace WaveShaper
 {
@@ -14,6 +19,8 @@ namespace WaveShaper
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        private PlotModel shapingFunctionPlot;
+
         private ObservableCollection<PiecewiseFunctionRow> piecewiseFunctionRows = new ObservableCollection<PiecewiseFunctionRow>
         {
             new PiecewiseFunctionRow
@@ -26,9 +33,42 @@ namespace WaveShaper
             }
         };
 
+
         public MainWindow()
         {
+            InitialisePlot();
             InitializeComponent();
+            PlotShapingFunction(Player.ShapingFunction);
+        }
+
+        private void InitialisePlot()
+        {
+            shapingFunctionPlot = new PlotModel
+            {
+                IsLegendVisible = false,
+                Title = "Shaping function",
+                TitleFontSize = 12,
+                TitleFont = "Segoe UI",
+                TitleFontWeight = 1
+            };
+            shapingFunctionPlot.Axes.Add(new LinearAxis
+                               {
+                                   Position = AxisPosition.Left,
+                                   Minimum = -1.1,
+                                   Maximum = 1.1,
+                                   ExtraGridlines = new[] {0d},
+                                   ExtraGridlineColor = OxyColors.LightGray,
+                                   Title = "f(x)"
+            });
+            shapingFunctionPlot.Axes.Add(new LinearAxis
+                               {
+                                   Position = AxisPosition.Bottom,
+                                   Minimum = -1.1,
+                                   Maximum = 1.1,
+                                   ExtraGridlines = new[] {0d},
+                                   ExtraGridlineColor = OxyColors.LightGray,
+                                   Title = "x"
+            });
         }
 
         public ObservableCollection<PiecewiseFunctionRow> PiecewiseFunctionRows
@@ -42,12 +82,22 @@ namespace WaveShaper
             }
         }
 
+        public PlotModel ShapingFunctionPlot
+        {
+            get { return shapingFunctionPlot; }
+            set
+            {
+                if (Equals(value, shapingFunctionPlot)) return;
+                shapingFunctionPlot = value;
+                OnPropertyChanged();
+            }
+        }
 
         private void DdlProcessingType_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
         }
 
-        private void Button_OnClick(object sender, RoutedEventArgs e)
+        private void BtnApply_OnClick(object sender, RoutedEventArgs e)
         {
             var mode = (ProcessingType) DdlProcessingType.SelectedValue;
 
@@ -73,9 +123,21 @@ namespace WaveShaper
                     function.AddPiece(piece);
                 }
 
+                function.Preprocess = x => x.Clamp(-1, 1);
                 Player.ShapingFunction = function.Calculate;
+
+                PlotShapingFunction(Player.ShapingFunction);
             }
         }
+
+        private void PlotShapingFunction(Func<double, double> shapingFunction)
+        {
+            ShapingFunctionPlot.Series.Clear();
+            ShapingFunctionPlot.Series.Add(new FunctionSeries(shapingFunction, -1, 1, 100, "f(x)"));
+            ShapingFunctionPlot.InvalidatePlot(true);
+        }
+
+        #region PropertyChanged
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -84,7 +146,7 @@ namespace WaveShaper
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-    }
 
-        
+        #endregion
+    }
 }

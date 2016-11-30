@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -16,6 +17,7 @@ namespace WaveShaper.Controls
     public partial class Player : UserControl
     {
         private WaveSample inputSamples;
+        private string currentFilename;
         private WaveOut waveOut;
         private ShapingSampleProvider samplesProvider;
         private Func<double, double> shapingFunction;
@@ -33,7 +35,7 @@ namespace WaveShaper.Controls
 
         public Func<double, double> ShapingFunction
         {
-            get { return samplesProvider.ShapingFunction; }
+            get { return samplesProvider?.ShapingFunction ?? shapingFunction ?? ShapingSampleProvider.DefaultShapingFunction; }
             set
             {
                 shapingFunction = value;
@@ -79,6 +81,7 @@ namespace WaveShaper.Controls
                 }
 
                 inputSamples = new WaveSample(samples, afr.WaveFormat);
+                currentFilename = openFileDialog.FileName;
                 LblFileTitle.Content = openFileDialog.FileName;
                 SetLabelTime(TimeSpan.Zero, inputSamples.TimeSpanLength);
 
@@ -90,8 +93,13 @@ namespace WaveShaper.Controls
 
         private void BtnPlay_OnClick(object sender, RoutedEventArgs e)
         {
-            if (BtnPlay.IsChecked == null || inputSamples == null)
+            if (BtnPlay.IsChecked == null)
                 return;
+
+            if (inputSamples == null)
+            {
+                BtnOpenFile_OnClick(BtnOpenFile, e);
+            }
 
             if (BtnPlay.IsChecked.Value)
                 waveOut.Play();
@@ -99,6 +107,30 @@ namespace WaveShaper.Controls
                 waveOut.Pause();
 
             SetButtonPlay(!BtnPlay.IsChecked.Value);
+        }
+
+        private void BtnSaveFile_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (samplesProvider == null)
+                return;
+
+            BtnStop_OnClick(BtnStop, e);
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                FileName = Path.GetFileNameWithoutExtension(currentFilename),
+                DefaultExt = Path.GetExtension(currentFilename),
+                Filter = "Wave Audio (.wav)|*.wav"
+            };
+
+            if (saveFileDialog.ShowDialog() != true)
+                return;
+
+
+            using (new WaitCursor())
+            {
+                WaveFileWriter.CreateWaveFile(saveFileDialog.FileName, samplesProvider);
+            }
         }
 
         private void BtnStop_OnClick(object sender, RoutedEventArgs e)
@@ -109,6 +141,7 @@ namespace WaveShaper.Controls
             waveOut.Stop();
             samplesProvider.Position = 0;
             SetButtonPlay(true);
+            BtnPlay.IsChecked = false;
         }
 
         private void SetButtonPlay(bool play)
@@ -130,5 +163,6 @@ namespace WaveShaper.Controls
         {
             LblTime.Content = $"{current:mm\\:ss} / {total:mm\\:ss}";
         }
+       
     }
 }

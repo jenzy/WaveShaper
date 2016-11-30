@@ -7,6 +7,8 @@ namespace WaveShaper
     {
         private readonly List<Piece<T>> pieces = new List<Piece<T>>();
 
+        public Func<T, T> Preprocess { get; set; }
+
         public void AddPiece(Piece<T> piece)
         {
             pieces.Add(piece);
@@ -14,6 +16,9 @@ namespace WaveShaper
 
         public T Calculate(T x)
         {
+            if (Preprocess != null)
+                x = Preprocess(x);
+
             foreach (var piece in pieces)
             {
                 if (piece.Condition(x))

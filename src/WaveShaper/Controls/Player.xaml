@@ -8,12 +8,13 @@
     <Grid>
         <GroupBox Header="Player" Margin="0,0,1,0" >
             <DockPanel>
-                <Label Name="LblFileTitle">No file loaded...</Label>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
-                    <Label x:Name="LblTime" RenderTransformOrigin="1.526,1.526" Content="0:00 / 0:00" />
-                    <ToggleButton x:Name="BtnPlay" Click="BtnPlay_OnClick" Content="▶" MinWidth="25" MinHeight="25"/>
-                    <Button x:Name="BtnStop" Click="BtnStop_OnClick" Content="■" MinWidth="25" MinHeight="25"/>
-                    <Button x:Name="BtnOpenFile" Click="BtnOpenFile_OnClick" Content="📂" MinWidth="25" MinHeight="25"/>
+                <Label Name="LblFileTitle" VerticalAlignment="Center">No file loaded...</Label>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right" VerticalAlignment="Center">
+                    <Label x:Name="LblTime" RenderTransformOrigin="1.526,1.526" Content="0:00 / 0:00" VerticalAlignment="Center"/>
+                    <ToggleButton x:Name="BtnPlay" Click="BtnPlay_OnClick" Content="▶" MinWidth="30" MinHeight="30" VerticalAlignment="Center"/>
+                    <Button x:Name="BtnStop" Click="BtnStop_OnClick" Content="■" MinWidth="30" MinHeight="30" VerticalAlignment="Center"/>
+                    <Button x:Name="BtnOpenFile" Click="BtnOpenFile_OnClick" Content="📂" MinWidth="30" MinHeight="30" VerticalAlignment="Center"/>
+                    <Button x:Name="BtnSaveFile" Click="BtnSaveFile_OnClick" Content="💾" MinWidth="30" MinHeight="30" VerticalAlignment="Center"/>
                 </StackPanel>
             </DockPanel>
         </GroupBox>
