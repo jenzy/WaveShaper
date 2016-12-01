@@ -56,17 +56,14 @@
                               Margin="10,10,10,10" BorderBrush="LightGray" BorderThickness="0" >
 
                 </oxy:PlotView>
-                <TabControl x:Name="TabControl" Margin="325,40,10,10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  
-                            SelectedIndex="{Binding SelectedIndex, ElementName=DdlProcessingType}">
+                <TabControl x:Name="TabControl" Margin="325,40,10,10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                     <TabControl.ItemContainerStyle>
                         <Style TargetType="{x:Type TabItem}">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </Style>
                     </TabControl.ItemContainerStyle>
-                    <TabItem Header="TabItem">
-                        <Grid/>
-                    </TabItem>
-                    <TabItem Header="TabItem">
+                    <TabItem Header="TabItem" x:Name="TabNone"/>
+                    <TabItem Header="TabItem" x:Name="TabTable">
                         <Grid >
                             <DataGrid x:Name="DgPiecewiseFunction" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                                       Margin="0,0,0,0" Height="Auto" Width="Auto" MinHeight="300"

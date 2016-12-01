@@ -93,6 +93,22 @@ namespace WaveShaper
 
         private void DdlProcessingType_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (TabControl == null)
+                return;
+
+            switch ((ProcessingType) DdlProcessingType.SelectedValue)
+            {
+                case ProcessingType.NoProcessing:
+                    TabControl.SelectedItem = TabNone;
+                    break;
+
+                case ProcessingType.PiecewiseFunction:
+                    TabControl.SelectedItem = TabTable;
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private void BtnApply_OnClick(object sender, RoutedEventArgs e)
@@ -123,16 +139,23 @@ namespace WaveShaper
 
                 function.Preprocess = x => x.Clamp(-1, 1);
                 Player.ShapingFunction = function.Calculate;
-
-                PlotShapingFunction(Player.ShapingFunction);
             }
+
+            PlotShapingFunction(Player.ShapingFunction);
         }
 
         private void PlotShapingFunction(Func<double, double> shapingFunction)
         {
-            ShapingFunctionPlot.Series.Clear();
-            ShapingFunctionPlot.Series.Add(new FunctionSeries(shapingFunction, -1, 1, 100, "f(x)"));
-            ShapingFunctionPlot.InvalidatePlot(true);
+            try
+            {
+                ShapingFunctionPlot.Series.Clear();
+                ShapingFunctionPlot.Series.Add(new FunctionSeries(shapingFunction, -1, 1, 100, "f(x)"));
+                ShapingFunctionPlot.InvalidatePlot(true);
+            }
+            catch (PiecewiseFunctionInputOutOfRange)
+            {
+                MessageBox.Show(this, "Function does not cover all possible values.", "Error");
+            }
         }
 
         #region PropertyChanged
