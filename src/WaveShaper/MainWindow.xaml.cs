@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Jace;
 using OxyPlot;
 using OxyPlot.Axes;
@@ -25,9 +25,7 @@ namespace WaveShaper
         {
             new PiecewiseFunctionRow
             {
-                From = -1,
                 FromOperator = Operator.LessOrEqualThan,
-                To = 1,
                 ToOperator = Operator.LessOrEqualThan,
                 Expression = "x"
             }
@@ -148,5 +146,37 @@ namespace WaveShaper
         }
 
         #endregion
+
+        private void CommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            var param = (string) e.Parameter;
+            switch (param)
+            {
+                case "Identity":
+                    PiecewiseFunctionRows.Clear();
+                    PiecewiseFunctionRows.Add(new PiecewiseFunctionRow
+                    {
+                        FromOperator = Operator.LessOrEqualThan,
+                        ToOperator = Operator.LessOrEqualThan,
+                        Expression = "x"
+                    });
+                    break;
+
+                case "SoftClipping":
+                    PiecewiseFunctionRows.Clear();
+                    PiecewiseFunctionRows.Add(new PiecewiseFunctionRow {ToOperator = Operator.LessOrEqualThan, To = -1, Expression = "-2/3"});
+                    PiecewiseFunctionRows.Add(new PiecewiseFunctionRow
+                    {
+                        From = -1,
+                        FromOperator = Operator.LessThan,
+                        ToOperator = Operator.LessThan,
+                        To = 1,
+                        Expression = "x - (x^3)/3"
+                    });
+                    PiecewiseFunctionRows.Add(new PiecewiseFunctionRow {FromOperator = Operator.LessOrEqualThan, From = 1, Expression = "2/3"});
+                    break;
+            }
+
+        }
     }
 }

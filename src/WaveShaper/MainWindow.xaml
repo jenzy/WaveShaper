@@ -7,8 +7,9 @@
         xmlns:controls="clr-namespace:WaveShaper.Controls"
         xmlns:utils="clr-namespace:WaveShaper.Utilities"
         xmlns:oxy="http://oxyplot.org/wpf"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
-        Title="WaveShaper" Height="511.039" Width="1054.489"
+        Title="WaveShaper" Height="511.039" Width="1054.489" 
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Window.Resources>
         <!--<utils:WpfEnumDisplayConverter x:Key="EnumConverter"/>-->
@@ -23,24 +24,39 @@
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="local:CustomCommands.Preset" Executed="CommandBinding_OnExecuted" />
+    </Window.CommandBindings>
+
     <Grid>
         <controls:Player Margin="10,10,10,0" VerticalAlignment="Top" x:Name="Player" />
         <GroupBox Header="Waveshaper" Margin="10,64,10,10">
             <Grid>
-                <StackPanel Orientation="Horizontal" Margin="325,10,0,0" HorizontalAlignment="Left"  VerticalAlignment="Top">
+                <DockPanel Margin="325,10,10,0" HorizontalAlignment="Stretch"  VerticalAlignment="Top">
                     <ComboBox x:Name="DdlProcessingType" 
                           ItemsSource="{Binding Source={StaticResource DpProcessingTypes}}"  DisplayMemberPath="Text" SelectedValuePath="Value"
                           SelectedIndex="0" IsSynchronizedWithCurrentItem="True"
                           SelectionChanged="DdlProcessingType_OnSelectionChanged" Width="150" />
                     <Button x:Name="BtnApply" Content="_Apply" HorizontalAlignment="Left" Width="60" Margin="10,0,0,0" 
                             Click="BtnApply_OnClick"/>
-                </StackPanel>
+                    <Button x:Name="BtnPresets" Content="Presets ▾" HorizontalAlignment="Right" Width="60" Margin="10,0,0,0" >
+                        <i:Interaction.Behaviors>
+                            <utils:DropDownButtonBehavior/>
+                        </i:Interaction.Behaviors>
+                        <Button.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Identity" Command="local:CustomCommands.Preset" CommandParameter="Identity" />
+                                <MenuItem Header="Soft clipping" Command="local:CustomCommands.Preset" CommandParameter="SoftClipping" />
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
+                </DockPanel>
                 <oxy:PlotView Model="{Binding ShapingFunctionPlot}" 
                               HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="300"
                               Margin="10,10,10,10" BorderBrush="LightGray" BorderThickness="0" >
 
                 </oxy:PlotView>
-                <TabControl x:Name="TabControl" Margin="325,40,10,10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" 
+                <TabControl x:Name="TabControl" Margin="325,40,10,10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"  
                             SelectedIndex="{Binding SelectedIndex, ElementName=DdlProcessingType}">
                     <TabControl.ItemContainerStyle>
                         <Style TargetType="{x:Type TabItem}">
@@ -55,7 +71,6 @@
                             <DataGrid x:Name="DgPiecewiseFunction" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                                       Margin="0,0,0,0" Height="Auto" Width="Auto" MinHeight="300"
                                       CanUserAddRows="True" CanUserDeleteRows="True" AutoGenerateColumns="False"
-                                      
                                       ItemsSource="{Binding PiecewiseFunctionRows, Mode=TwoWay}">
                                 <DataGrid.CellStyle>
                                     <Style TargetType="{x:Type DataGridCell}">
@@ -72,15 +87,19 @@
                                     </Style>
                                 </DataGrid.CellStyle>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Binding="{Binding From, StringFormat='{}{0:0.0###}'}" MinWidth="50">
+                                    <DataGridTextColumn MinWidth="50" ClipboardContentBinding="{Binding From}" >
                                         <DataGridTextColumn.EditingElementStyle>
-                                            <Style>
-                                                <Setter Property="TextBox.TextAlignment" Value="Right" />
+                                            <Style TargetType="TextBox" >
+                                                <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
+                                                <Setter Property="Text" Value="{Binding From, StringFormat='{}{0:0.0###}', TargetNullValue=''}"/>
+                                                <Setter Property="TextAlignment" Value="Right" />
                                             </Style>
                                         </DataGridTextColumn.EditingElementStyle>
                                         <DataGridTextColumn.ElementStyle>
-                                            <Style>
-                                                <Setter Property="TextBlock.TextAlignment" Value="Right" />
+                                            <Style TargetType="TextBlock">
+                                                <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
+                                                <Setter Property="Text" Value="{Binding FromDisplay}"/>
+                                                <Setter Property="TextAlignment" Value="Right" />
                                             </Style>
                                         </DataGridTextColumn.ElementStyle>
                                     </DataGridTextColumn>
@@ -119,15 +138,19 @@
                                             </Style>
                                         </DataGridComboBoxColumn.ElementStyle>
                                     </DataGridComboBoxColumn>
-                                    <DataGridTextColumn Binding="{Binding To, StringFormat='{}{0:0.0###}'}" MinWidth="50">
+                                    <DataGridTextColumn MinWidth="50" ClipboardContentBinding="{Binding To}" >
                                         <DataGridTextColumn.EditingElementStyle>
-                                            <Style>
-                                                <Setter Property="TextBox.TextAlignment" Value="Right" />
+                                            <Style TargetType="TextBox" >
+                                                <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
+                                                <Setter Property="Text" Value="{Binding To, StringFormat='{}{0:0.0###}', TargetNullValue=''}"/>
+                                                <Setter Property="TextAlignment" Value="Right" />
                                             </Style>
                                         </DataGridTextColumn.EditingElementStyle>
                                         <DataGridTextColumn.ElementStyle>
-                                            <Style>
-                                                <Setter Property="TextBlock.TextAlignment" Value="Right" />
+                                            <Style TargetType="TextBlock">
+                                                <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
+                                                <Setter Property="Text" Value="{Binding ToDisplay}"/>
+                                                <Setter Property="TextAlignment" Value="Right" />
                                             </Style>
                                         </DataGridTextColumn.ElementStyle>
                                     </DataGridTextColumn>
@@ -141,6 +164,10 @@
         </GroupBox>
     </Grid>
 </Window>
+
+
+
+
 
 
 

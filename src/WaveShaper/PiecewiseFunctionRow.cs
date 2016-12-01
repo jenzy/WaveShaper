@@ -30,6 +30,7 @@ namespace WaveShaper
                 if (value == from) return;
                 from = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(FromDisplay));
             }
         }
 
@@ -52,6 +53,7 @@ namespace WaveShaper
                 if (value == to) return;
                 to = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(ToDisplay));
             }
         }
 
@@ -78,6 +80,10 @@ namespace WaveShaper
         }
 
         public string VariableDisplay => "x";
+
+        public string FromDisplay => From?.ToString() ?? "-∞";
+
+        public string ToDisplay => To?.ToString() ?? "∞";
 
         public Predicate<double> GetCondition()
         {

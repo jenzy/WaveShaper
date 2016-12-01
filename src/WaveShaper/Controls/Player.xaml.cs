@@ -87,8 +87,14 @@ namespace WaveShaper.Controls
 
                 samplesProvider = new ShapingSampleProvider(inputSamples, shapingFunction);
                 waveOut = new WaveOut();
+                waveOut.PlaybackStopped += WaveOutOnPlaybackStopped;
                 waveOut.Init(samplesProvider);
             }
+        }
+
+        private void WaveOutOnPlaybackStopped(object sender, StoppedEventArgs stoppedEventArgs)
+        {
+            BtnStop_OnClick(BtnStop, null);
         }
 
         private void BtnPlay_OnClick(object sender, RoutedEventArgs e)
