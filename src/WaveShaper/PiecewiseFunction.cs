@@ -25,7 +25,7 @@ namespace WaveShaper
                     return piece.Function(x);
             }
 
-            throw new PiecewiseFunctionInputOutOfRange(nameof(x));
+            throw new PiecewiseFunctionInputOutOfRange(nameof(x), x, null);
         }
     }
 
@@ -43,6 +43,10 @@ namespace WaveShaper
         }
 
         public PiecewiseFunctionInputOutOfRange(string paramName) : base(paramName)
+        {
+        }
+
+        public PiecewiseFunctionInputOutOfRange(string paramName, object actualValue, string message) : base(paramName, actualValue, message)
         {
         }
     }

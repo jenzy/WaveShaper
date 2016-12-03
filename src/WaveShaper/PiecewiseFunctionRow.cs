@@ -1,17 +1,17 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using WaveShaper.Annotations;
 
 namespace WaveShaper
 {
     public enum Operator
     {
-        [Description("<")]
-        LessThan,
+        [Description("<")] LessThan,
 
-        [Description("<=")]
-        LessOrEqualThan
+        [Description("<=")] LessOrEqualThan
     }
 
     public class PiecewiseFunctionRow : INotifyPropertyChanged
@@ -21,6 +21,13 @@ namespace WaveShaper
         private Operator fromOperator;
         private double? from;
         private string expression;
+
+        public PiecewiseFunctionRow(ProcessingType mode = ProcessingType.PiecewiseFunction)
+        {
+            Mode = mode;
+        }
+
+        public ProcessingType Mode { get; private set; }
 
         public double? From
         {
@@ -76,6 +83,7 @@ namespace WaveShaper
                 if (value == expression) return;
                 expression = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(ExpressionDisplay));
             }
         }
 
@@ -84,6 +92,8 @@ namespace WaveShaper
         public string FromDisplay => From?.ToString() ?? "-∞";
 
         public string ToDisplay => To?.ToString() ?? "∞";
+
+        public string ExpressionDisplay => Mode == ProcessingType.PiecewiseFunction ? Expression : PolynomialExpressionToDisplayString(Expression);
 
         public Predicate<double> GetCondition()
         {
@@ -111,6 +121,25 @@ namespace WaveShaper
             };
         }
 
+        public Func<double, double> GetPolynomialFunction()
+        {
+            if (Mode != ProcessingType.PiecewisePolynomial)
+                throw new InvalidOperationException();
+
+            try
+            {
+                var coefficients = expression.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                             .Select(double.Parse)
+                                             .ToList();
+
+                return x => coefficients.Select((c, i) => c * Math.Pow(x, i)).Sum();
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException("Error in polynomial: " + e.Message, e);
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
@@ -119,5 +148,63 @@ namespace WaveShaper
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        private static string PolynomialExpressionToDisplayString(string expression)
+        {
+            try
+            {
+                var coefficients = expression.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
+                                             .Select(decimal.Parse)
+                                             .ToList();
+               
+                var sb = new StringBuilder();
+                for (int i = 0; i < coefficients.Count; i++)
+                {
+                    if (coefficients[i] == 0)
+                        continue;
+
+                    if (i == 0)
+                    {
+                        sb.Append(coefficients[i]);
+                    }
+                    else
+                    {
+                        sb.AppendFormat(" {0} ", Math.Sign(coefficients[i]) >= 0 ? '+' : '-');
+                        if (coefficients[i] != 1)
+                            sb.AppendFormat("{0}⋅", Math.Abs(coefficients[i]));
+                        if (i == 1)
+                            sb.Append("x");
+                        else
+                            sb.AppendFormat("x{0}", IntToSuperscript(i));
+                    }
+                }
+
+                return sb.ToString().TrimStart(' ', '+');
+            }
+            catch
+            {
+                return expression;
+            }
+        }
+
+        private static string IntToSuperscript(int x) => new string(x.ToString().Select(CharToSuperscript).ToArray());
+
+        private static char CharToSuperscript(char c)
+        {
+            switch (c)
+            {
+                case '0': return '\x2070';
+                case '1': return '\xB9';
+                case '2': return '\xB2';
+                case '3': return '\xB3';
+                case '4': return '\x2074';
+                case '5': return '\x2075';
+                case '6': return '\x2076';
+                case '7': return '\x2077';
+                case '8': return '\x2078';
+                case '9': return '\x2079';
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(c), c, null);
+        }
     }
 }

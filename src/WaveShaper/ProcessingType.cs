@@ -7,6 +7,9 @@ namespace WaveShaper
         [Description("No processing")]
         NoProcessing,
 
+        [Description("Piecewise polynomial")]
+        PiecewisePolynomial,
+
         [Description("Piecewise function")]
         PiecewiseFunction
     }

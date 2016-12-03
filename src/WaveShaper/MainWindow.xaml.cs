@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,10 +21,11 @@ namespace WaveShaper
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private PlotModel shapingFunctionPlot;
+        private ObservableCollection<PiecewiseFunctionRow> rows;
 
         private ObservableCollection<PiecewiseFunctionRow> piecewiseFunctionRows = new ObservableCollection<PiecewiseFunctionRow>
         {
-            new PiecewiseFunctionRow
+            new PiecewiseFunctionRow(ProcessingType.PiecewiseFunction)
             {
                 FromOperator = Operator.LessOrEqualThan,
                 ToOperator = Operator.LessOrEqualThan,
@@ -31,6 +33,15 @@ namespace WaveShaper
             }
         };
 
+        private ObservableCollection<PiecewiseFunctionRow> piecewisePolynomialRows = new ObservableCollection<PiecewiseFunctionRow>
+        {
+            new PiecewiseFunctionRow(ProcessingType.PiecewisePolynomial)
+            {
+                FromOperator = Operator.LessOrEqualThan,
+                ToOperator = Operator.LessOrEqualThan,
+                Expression = "0, 1"
+            }
+        };
 
         public MainWindow()
         {
@@ -69,13 +80,13 @@ namespace WaveShaper
             });
         }
 
-        public ObservableCollection<PiecewiseFunctionRow> PiecewiseFunctionRows
+        public ObservableCollection<PiecewiseFunctionRow> Rows
         {
-            get { return piecewiseFunctionRows; }
+            get { return rows; }
             set
             {
-                if (Equals(value, piecewiseFunctionRows)) return;
-                piecewiseFunctionRows = value;
+                if (Equals(value, rows)) return;
+                rows = value;
                 OnPropertyChanged();
             }
         }
@@ -96,19 +107,30 @@ namespace WaveShaper
             if (TabControl == null)
                 return;
 
-            switch ((ProcessingType) DdlProcessingType.SelectedValue)
+            var previousType = (ProcessingType) e.RemovedItems.Cast<EnumUtil.EnumListItem>().Single().Value;
+            var newType = (ProcessingType) e.AddedItems.Cast<EnumUtil.EnumListItem>().Single().Value;
+
+            switch (newType)
             {
                 case ProcessingType.NoProcessing:
                     TabControl.SelectedItem = TabNone;
                     break;
 
+                case ProcessingType.PiecewisePolynomial:
+                    InitFunctionRows(previousType, newType);
+                    TabControl.SelectedItem = TabTable;
+                    break;
+
                 case ProcessingType.PiecewiseFunction:
+                    InitFunctionRows(previousType, newType);
                     TabControl.SelectedItem = TabTable;
                     break;
 
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
+            BtnPresets.IsEnabled = newType != ProcessingType.NoProcessing;
         }
 
         private void BtnApply_OnClick(object sender, RoutedEventArgs e)
@@ -121,13 +143,13 @@ namespace WaveShaper
             }
             else if (mode == ProcessingType.PiecewiseFunction)
             {
-                var items = PiecewiseFunctionRows;
+                var items = Rows;
 
                 var function = new PiecewiseFunction<double>();
                 var engine = new CalculationEngine();
                 foreach (PiecewiseFunctionRow item in items)
                 {
-                    var piece = new Piece<double>()
+                    var piece = new Piece<double>
                     {
                         Condition = item.GetCondition(),
                         Function = (Func<double, double>) engine.Formula(item.Expression)
@@ -140,8 +162,62 @@ namespace WaveShaper
                 function.Preprocess = x => x.Clamp(-1, 1);
                 Player.ShapingFunction = function.Calculate;
             }
+            else if (mode == ProcessingType.PiecewisePolynomial)
+            {
+                var items = Rows;
+
+                var function = new PiecewiseFunction<double>();
+                foreach (PiecewiseFunctionRow item in items)
+                {
+                    function.AddPiece(new Piece<double>
+                    {
+                        Condition = item.GetCondition(),
+                        Function = item.GetPolynomialFunction()
+                    });
+                }
+
+                function.Preprocess = x => x.Clamp(-1, 1);
+                Player.ShapingFunction = function.Calculate;
+            }
 
             PlotShapingFunction(Player.ShapingFunction);
+        }
+
+        private void InitFunctionRows(ProcessingType old, ProcessingType newType)
+        {
+            switch (old)
+            {
+                case ProcessingType.NoProcessing:
+                    break;
+
+                case ProcessingType.PiecewisePolynomial:
+                    piecewisePolynomialRows = Rows;
+                    break;
+
+                case ProcessingType.PiecewiseFunction:
+                    piecewiseFunctionRows = Rows;
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(old), old, null);
+            }
+
+            switch (newType)
+            {
+                case ProcessingType.NoProcessing:
+                    throw new InvalidOperationException();
+
+                case ProcessingType.PiecewisePolynomial:
+                    Rows = piecewisePolynomialRows;
+                    break;
+
+                case ProcessingType.PiecewiseFunction:
+                    Rows = piecewiseFunctionRows;
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(newType), newType, null);
+            }
         }
 
         private void PlotShapingFunction(Func<double, double> shapingFunction)
@@ -173,30 +249,58 @@ namespace WaveShaper
         private void CommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             var param = (string) e.Parameter;
+            var type = (ProcessingType) DdlProcessingType.SelectedValue;
+            if (type == ProcessingType.NoProcessing)
+                return;
+
             switch (param)
             {
                 case "Identity":
-                    PiecewiseFunctionRows.Clear();
-                    PiecewiseFunctionRows.Add(new PiecewiseFunctionRow
+                    Rows.Clear();
+                    if (type == ProcessingType.PiecewiseFunction)
                     {
-                        FromOperator = Operator.LessOrEqualThan,
-                        ToOperator = Operator.LessOrEqualThan,
-                        Expression = "x"
-                    });
+                        Rows.Add(new PiecewiseFunctionRow
+                        {
+                            Expression = "x"
+                        });
+                    }
+                    else if (type == ProcessingType.PiecewisePolynomial)
+                    {
+                        Rows.Add(new PiecewiseFunctionRow(mode: ProcessingType.PiecewisePolynomial)
+                        {
+                            Expression = "0,1"
+                        });
+                    }
                     break;
 
                 case "SoftClipping":
-                    PiecewiseFunctionRows.Clear();
-                    PiecewiseFunctionRows.Add(new PiecewiseFunctionRow {ToOperator = Operator.LessOrEqualThan, To = -1, Expression = "-2/3"});
-                    PiecewiseFunctionRows.Add(new PiecewiseFunctionRow
+                    Rows.Clear();
+                    if (type == ProcessingType.PiecewiseFunction)
                     {
-                        From = -1,
-                        FromOperator = Operator.LessThan,
-                        ToOperator = Operator.LessThan,
-                        To = 1,
-                        Expression = "x - (x^3)/3"
-                    });
-                    PiecewiseFunctionRows.Add(new PiecewiseFunctionRow {FromOperator = Operator.LessOrEqualThan, From = 1, Expression = "2/3"});
+                        Rows.Add(new PiecewiseFunctionRow { ToOperator = Operator.LessOrEqualThan, To = -1, Expression = "-2/3" });
+                        Rows.Add(new PiecewiseFunctionRow
+                        {
+                            From = -1,
+                            FromOperator = Operator.LessThan,
+                            ToOperator = Operator.LessThan,
+                            To = 1,
+                            Expression = "x - (x^3)/3"
+                        });
+                        Rows.Add(new PiecewiseFunctionRow { FromOperator = Operator.LessOrEqualThan, From = 1, Expression = "2/3" });
+                    }
+                    else if (type == ProcessingType.PiecewisePolynomial)
+                    {
+                        Rows.Add(new PiecewiseFunctionRow(mode: ProcessingType.PiecewisePolynomial) { ToOperator = Operator.LessOrEqualThan, To = -1, Expression = "-0.666" });
+                        Rows.Add(new PiecewiseFunctionRow(mode: ProcessingType.PiecewisePolynomial)
+                        {
+                            From = -1,
+                            FromOperator = Operator.LessThan,
+                            ToOperator = Operator.LessThan,
+                            To = 1,
+                            Expression = "0, 1, 0, -0.333"
+                        });
+                        Rows.Add(new PiecewiseFunctionRow(mode: ProcessingType.PiecewisePolynomial) { FromOperator = Operator.LessOrEqualThan, From = 1, Expression = "0.666" });
+                    }
                     break;
             }
 

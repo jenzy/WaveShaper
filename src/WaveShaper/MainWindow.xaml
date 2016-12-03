@@ -39,7 +39,7 @@
                           SelectionChanged="DdlProcessingType_OnSelectionChanged" Width="150" />
                     <Button x:Name="BtnApply" Content="_Apply" HorizontalAlignment="Left" Width="60" Margin="10,0,0,0" 
                             Click="BtnApply_OnClick"/>
-                    <Button x:Name="BtnPresets" Content="Presets ▾" HorizontalAlignment="Right" Width="60" Margin="10,0,0,0" >
+                    <Button x:Name="BtnPresets" Content="Presets ▾" HorizontalAlignment="Right" Width="60" Margin="10,0,0,0" IsEnabled="False" >
                         <i:Interaction.Behaviors>
                             <utils:DropDownButtonBehavior/>
                         </i:Interaction.Behaviors>
@@ -68,7 +68,7 @@
                             <DataGrid x:Name="DgPiecewiseFunction" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                                       Margin="0,0,0,0" Height="Auto" Width="Auto" MinHeight="300"
                                       CanUserAddRows="True" CanUserDeleteRows="True" AutoGenerateColumns="False"
-                                      ItemsSource="{Binding PiecewiseFunctionRows, Mode=TwoWay}">
+                                      ItemsSource="{Binding Rows, Mode=TwoWay}">
                                 <DataGrid.CellStyle>
                                     <Style TargetType="{x:Type DataGridCell}">
                                         <Setter Property="Template">
@@ -151,7 +151,20 @@
                                             </Style>
                                         </DataGridTextColumn.ElementStyle>
                                     </DataGridTextColumn>
-                                    <DataGridTextColumn Header="f(x)" Binding="{Binding Expression}" Width="200*" />
+                                    <DataGridTextColumn Header="f(x)" ClipboardContentBinding="{Binding Expression}" Width="200*">
+                                        <DataGridTextColumn.EditingElementStyle>
+                                            <Style TargetType="TextBox" >
+                                                <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
+                                                <Setter Property="Text" Value="{Binding Expression, TargetNullValue=''}"/>
+                                            </Style>
+                                        </DataGridTextColumn.EditingElementStyle>
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
+                                                <Setter Property="Text" Value="{Binding ExpressionDisplay}"/>
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Grid>
