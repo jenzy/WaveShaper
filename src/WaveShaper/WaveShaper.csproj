@@ -90,6 +90,9 @@
     <Compile Include="Utilities\WaitCursor.cs" />
     <Compile Include="Utilities\WpfEnumDisplayConverter.cs" />
     <Compile Include="WaveSample.cs" />
+    <Compile Include="Windows\EffectPreview.xaml.cs">
+      <DependentUpon>EffectPreview.xaml</DependentUpon>
+    </Compile>
     <Page Include="Controls\Player.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -106,6 +109,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Windows\EffectPreview.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -12,6 +13,7 @@ using OxyPlot.Axes;
 using OxyPlot.Series;
 using WaveShaper.Annotations;
 using WaveShaper.Utilities;
+using WaveShaper.Windows;
 
 namespace WaveShaper
 {
@@ -135,50 +137,8 @@ namespace WaveShaper
 
         private void BtnApply_OnClick(object sender, RoutedEventArgs e)
         {
-            var mode = (ProcessingType) DdlProcessingType.SelectedValue;
-
-            if (mode == ProcessingType.NoProcessing)
-            {
-                Player.ShapingFunction = ShapingSampleProvider.DefaultShapingFunction;
-            }
-            else if (mode == ProcessingType.PiecewiseFunction)
-            {
-                var items = Rows;
-
-                var function = new PiecewiseFunction<double>();
-                var engine = new CalculationEngine();
-                foreach (PiecewiseFunctionRow item in items)
-                {
-                    var piece = new Piece<double>
-                    {
-                        Condition = item.GetCondition(),
-                        Function = (Func<double, double>) engine.Formula(item.Expression)
-                                                                .Parameter("x", DataType.FloatingPoint)
-                                                                .Result(DataType.FloatingPoint).Build()
-                    };
-                    function.AddPiece(piece);
-                }
-
-                function.Preprocess = x => x.Clamp(-1, 1);
-                Player.ShapingFunction = function.Calculate;
-            }
-            else if (mode == ProcessingType.PiecewisePolynomial)
-            {
-                var items = Rows;
-
-                var function = new PiecewiseFunction<double>();
-                foreach (PiecewiseFunctionRow item in items)
-                {
-                    function.AddPiece(new Piece<double>
-                    {
-                        Condition = item.GetCondition(),
-                        Function = item.GetPolynomialFunction()
-                    });
-                }
-
-                function.Preprocess = x => x.Clamp(-1, 1);
-                Player.ShapingFunction = function.Calculate;
-            }
+            //var mode = (ProcessingType) DdlProcessingType.SelectedValue;
+            Player.ShapingFunction = BuildFunction();
 
             PlotShapingFunction(Player.ShapingFunction);
         }
@@ -232,6 +192,63 @@ namespace WaveShaper
             {
                 MessageBox.Show(this, "Function does not cover all possible values.", "Error");
             }
+        }
+
+        private Func<double, double> BuildFunction()
+        {
+            var mode = (ProcessingType)DdlProcessingType.SelectedValue;
+
+            Func<double, double> func = null;
+            switch (mode)
+            {
+                case ProcessingType.NoProcessing:
+                    func = ShapingSampleProvider.DefaultShapingFunction;
+                    break;
+                case ProcessingType.PiecewiseFunction:
+                    func = BuildPiecewiseFunction(Rows).Calculate;
+                    break;
+                case ProcessingType.PiecewisePolynomial:
+                    func = BuildPiecewisePolynomial(Rows).Calculate;
+                    break;
+            }
+
+            return func;
+        }
+
+        private static PiecewiseFunction<double> BuildPiecewiseFunction(IEnumerable<PiecewiseFunctionRow> rows)
+        {
+            var function = new PiecewiseFunction<double>();
+            var engine = new CalculationEngine();
+            foreach (var row in rows)
+            {
+                var piece = new Piece<double>
+                {
+                    Condition = row.GetCondition(),
+                    Function = (Func<double, double>)engine.Formula(row.Expression)
+                                                            .Parameter("x", DataType.FloatingPoint)
+                                                            .Result(DataType.FloatingPoint).Build()
+                };
+                function.AddPiece(piece);
+            }
+
+            function.Preprocess = x => x.Clamp(-1, 1);
+            return function;
+        }
+
+        private static PiecewiseFunction<double> BuildPiecewisePolynomial(IEnumerable<PiecewiseFunctionRow> rows)
+        {
+            var function = new PiecewiseFunction<double>();
+            foreach (var row in rows)
+            {
+                function.AddPiece(new Piece<double>
+                {
+                    Condition = row.GetCondition(),
+                    Function = row.GetPolynomialFunction()
+                });
+            }
+
+            function.Preprocess = x => x.Clamp(-1, 1);
+            return function;
         }
 
         #region PropertyChanged
@@ -304,6 +321,14 @@ namespace WaveShaper
                     break;
             }
 
+        }
+
+        private void BtnPreviewEffect_OnClick(object sender, RoutedEventArgs e)
+        {
+            var func = BuildFunction();
+
+            var window = new EffectPreview(func);
+            window.Show();
         }
     }
 }
