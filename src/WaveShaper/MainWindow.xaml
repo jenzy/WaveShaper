@@ -46,7 +46,8 @@
                         <Button.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Identity" Command="local:CustomCommands.Preset" CommandParameter="Identity" />
-                                <MenuItem Header="Soft clipping" Command="local:CustomCommands.Preset" CommandParameter="SoftClipping" />
+                                <MenuItem Header="Soft clipping 1" Command="local:CustomCommands.Preset" CommandParameter="SoftClipping1" />
+                                <MenuItem Header="Soft clipping 2" Command="local:CustomCommands.Preset" CommandParameter="SoftClipping2" />
                             </ContextMenu>
                         </Button.ContextMenu>
                     </Button>

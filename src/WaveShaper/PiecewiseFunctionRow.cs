@@ -22,6 +22,10 @@ namespace WaveShaper
         private double? from;
         private string expression;
 
+        public PiecewiseFunctionRow() : this(ProcessingType.PiecewiseFunction)
+        {
+        }
+
         public PiecewiseFunctionRow(ProcessingType mode = ProcessingType.PiecewiseFunction)
         {
             Mode = mode;

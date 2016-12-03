@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -224,7 +225,7 @@ namespace WaveShaper
                 var piece = new Piece<double>
                 {
                     Condition = row.GetCondition(),
-                    Function = (Func<double, double>)engine.Formula(row.Expression)
+                    Function = (Func<double, double>)engine.Formula(row.Expression.Replace("pi", Math.PI.ToString(CultureInfo.InvariantCulture)))
                                                             .Parameter("x", DataType.FloatingPoint)
                                                             .Result(DataType.FloatingPoint).Build()
                 };
@@ -290,7 +291,7 @@ namespace WaveShaper
                     }
                     break;
 
-                case "SoftClipping":
+                case "SoftClipping1":
                     Rows.Clear();
                     if (type == ProcessingType.PiecewiseFunction)
                     {
@@ -317,6 +318,23 @@ namespace WaveShaper
                             Expression = "0, 1, 0, -0.333"
                         });
                         Rows.Add(new PiecewiseFunctionRow(mode: ProcessingType.PiecewisePolynomial) { FromOperator = Operator.LessOrEqualThan, From = 1, Expression = "0.666" });
+                    }
+                    break;
+
+                case "SoftClipping2":
+                    if (type == ProcessingType.PiecewiseFunction)
+                    {
+                        Rows.Clear();
+                        Rows.Add(new PiecewiseFunctionRow { ToOperator = Operator.LessOrEqualThan, To = -0.5, Expression = "-1" });
+                        Rows.Add(new PiecewiseFunctionRow
+                        {
+                            From = -0.5,
+                            FromOperator = Operator.LessThan,
+                            ToOperator = Operator.LessThan,
+                            To = 0.5,
+                            Expression = "sin(pi * x / (2 * 0.5))"
+                        });
+                        Rows.Add(new PiecewiseFunctionRow { FromOperator = Operator.LessOrEqualThan, From = 0.5, Expression = "1" });
                     }
                     break;
             }
