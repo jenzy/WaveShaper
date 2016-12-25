@@ -75,6 +75,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Bezier\BezierControl.xaml.cs">
+      <DependentUpon>BezierControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Bezier\BezierCurve.cs" />
+    <Compile Include="Bezier\BezierFigure.cs" />
+    <Compile Include="Bezier\ThumbPoint.cs" />
     <Compile Include="Controls\Player.xaml.cs">
       <DependentUpon>Player.xaml</DependentUpon>
     </Compile>
@@ -93,6 +99,10 @@
     <Compile Include="Windows\EffectPreview.xaml.cs">
       <DependentUpon>EffectPreview.xaml</DependentUpon>
     </Compile>
+    <Page Include="Bezier\BezierControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\Player.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

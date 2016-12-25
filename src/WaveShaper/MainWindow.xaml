@@ -5,11 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WaveShaper"
         xmlns:controls="clr-namespace:WaveShaper.Controls"
+        xmlns:bezier="clr-namespace:WaveShaper.Bezier"
         xmlns:utils="clr-namespace:WaveShaper.Utilities"
         xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
-        Title="WaveShaper" Height="511.039" Width="1054.489" 
+        Title="WaveShaper" Height="600" Width="900" 
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Window.Resources>
         <!--<utils:WpfEnumDisplayConverter x:Key="EnumConverter"/>-->
@@ -166,6 +167,11 @@
                                     </DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="Bezier" x:Name="TabBezier">
+                        <Grid>
+                            <bezier:BezierControl></bezier:BezierControl>
                         </Grid>
                     </TabItem>
                 </TabControl>

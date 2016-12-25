@@ -11,6 +11,9 @@ namespace WaveShaper
         PiecewisePolynomial,
 
         [Description("Piecewise function")]
-        PiecewiseFunction
+        PiecewiseFunction,
+
+        [Description("Bezier curve")]
+        Bezier
     }
 }

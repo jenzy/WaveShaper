@@ -129,6 +129,10 @@ namespace WaveShaper
                     TabControl.SelectedItem = TabTable;
                     break;
 
+                case ProcessingType.Bezier:
+                    TabControl.SelectedItem = TabBezier;
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -148,9 +152,6 @@ namespace WaveShaper
         {
             switch (old)
             {
-                case ProcessingType.NoProcessing:
-                    break;
-
                 case ProcessingType.PiecewisePolynomial:
                     piecewisePolynomialRows = Rows;
                     break;
@@ -158,16 +159,10 @@ namespace WaveShaper
                 case ProcessingType.PiecewiseFunction:
                     piecewiseFunctionRows = Rows;
                     break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(old), old, null);
             }
 
             switch (newType)
             {
-                case ProcessingType.NoProcessing:
-                    throw new InvalidOperationException();
-
                 case ProcessingType.PiecewisePolynomial:
                     Rows = piecewisePolynomialRows;
                     break;
@@ -175,9 +170,6 @@ namespace WaveShaper
                 case ProcessingType.PiecewiseFunction:
                     Rows = piecewiseFunctionRows;
                     break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(newType), newType, null);
             }
         }
 
