@@ -1,0 +1,15 @@
+﻿<Window x:Class="WaveShaper.Windows.DebugPlot"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:oxy="http://oxyplot.org/wpf"
+        mc:Ignorable="d"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Title="EffectPreview" Height="600" Width="600">
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <oxy:PlotView Model="{Binding PlotModel}" 
+                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                              Margin="10,10,10,10" BorderBrush="LightGray" BorderThickness="0" />
+    </Grid>
+</Window>

@@ -171,7 +171,7 @@
                     </TabItem>
                     <TabItem Header="Bezier" x:Name="TabBezier">
                         <Grid>
-                            <bezier:BezierControl></bezier:BezierControl>
+                            <bezier:BezierControl x:Name="Bezier"/>
                         </Grid>
                     </TabItem>
                 </TabControl>

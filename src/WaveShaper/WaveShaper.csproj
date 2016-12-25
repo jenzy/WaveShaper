@@ -39,6 +39,10 @@
       <HintPath>..\packages\Jace.0.8.7\lib\net40\Jace.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MathNet.Numerics, Version=3.13.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.3.13.1\lib\net40\MathNet.Numerics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="NAudio, Version=1.7.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NAudio.1.7.3\lib\net35\NAudio.dll</HintPath>
       <Private>True</Private>
@@ -53,6 +57,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Expression.Blend.Sdk.1.0.2\lib\net45\System.Windows.Interactivity.dll</HintPath>
       <Private>True</Private>
@@ -90,12 +95,17 @@
     <Compile Include="ProcessingType.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ShapingSampleProvider.cs" />
+    <Compile Include="Utilities\CubicEquation.cs" />
     <Compile Include="Utilities\DropDownButtonBehaviour.cs" />
     <Compile Include="Utilities\EnumUtil.cs" />
     <Compile Include="Utilities\Extensions.cs" />
+    <Compile Include="Utilities\TupleExtensions.cs" />
     <Compile Include="Utilities\WaitCursor.cs" />
     <Compile Include="Utilities\WpfEnumDisplayConverter.cs" />
     <Compile Include="WaveSample.cs" />
+    <Compile Include="Windows\DebugPlot.xaml.cs">
+      <DependentUpon>DebugPlot.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\EffectPreview.xaml.cs">
       <DependentUpon>EffectPreview.xaml</DependentUpon>
     </Compile>
@@ -119,6 +129,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Windows\DebugPlot.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Windows\EffectPreview.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

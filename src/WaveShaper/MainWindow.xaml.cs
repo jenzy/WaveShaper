@@ -13,6 +13,7 @@ using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
 using WaveShaper.Annotations;
+using WaveShaper.Bezier;
 using WaveShaper.Utilities;
 using WaveShaper.Windows;
 
@@ -51,6 +52,18 @@ namespace WaveShaper
             InitialisePlot();
             InitializeComponent();
             PlotShapingFunction(Player.ShapingFunction);
+
+
+            //var bc = new BezierCurve()
+            //{
+            //    StartPoint = new Point(0, 0),
+            //    StartPointHandle = new Point(0.1, 0.1),
+            //    EndPointHandle = new Point(0.9, 0.9),
+            //    EndPoint = new Point(1, 1)
+            //};
+
+            //var y = CubicEquation.SolveBezier(bc, 0.1);
+
         }
 
         private void InitialisePlot()
@@ -63,24 +76,24 @@ namespace WaveShaper
                 TitleFont = "Segoe UI",
                 TitleFontWeight = 1
             };
-            shapingFunctionPlot.Axes.Add(new LinearAxis
-                               {
-                                   Position = AxisPosition.Left,
-                                   Minimum = -1.1,
-                                   Maximum = 1.1,
-                                   ExtraGridlines = new[] {0d},
-                                   ExtraGridlineColor = OxyColors.LightGray,
-                                   Title = "f(x)"
-            });
-            shapingFunctionPlot.Axes.Add(new LinearAxis
-                               {
-                                   Position = AxisPosition.Bottom,
-                                   Minimum = -1.1,
-                                   Maximum = 1.1,
-                                   ExtraGridlines = new[] {0d},
-                                   ExtraGridlineColor = OxyColors.LightGray,
-                                   Title = "x"
-            });
+            //shapingFunctionPlot.Axes.Add(new LinearAxis
+            //                   {
+            //                       Position = AxisPosition.Left,
+            //                       Minimum = -1.1,
+            //                       Maximum = 1.1,
+            //                       ExtraGridlines = new[] {0d},
+            //                       ExtraGridlineColor = OxyColors.LightGray,
+            //                       Title = "f(x)"
+            //});
+            //shapingFunctionPlot.Axes.Add(new LinearAxis
+            //                   {
+            //                       Position = AxisPosition.Bottom,
+            //                       Minimum = -1.1,
+            //                       Maximum = 1.1,
+            //                       ExtraGridlines = new[] {0d},
+            //                       ExtraGridlineColor = OxyColors.LightGray,
+            //                       Title = "x"
+            //});
         }
 
         public ObservableCollection<PiecewiseFunctionRow> Rows
@@ -142,7 +155,6 @@ namespace WaveShaper
 
         private void BtnApply_OnClick(object sender, RoutedEventArgs e)
         {
-            //var mode = (ProcessingType) DdlProcessingType.SelectedValue;
             Player.ShapingFunction = BuildFunction();
 
             PlotShapingFunction(Player.ShapingFunction);
@@ -178,7 +190,8 @@ namespace WaveShaper
             try
             {
                 ShapingFunctionPlot.Series.Clear();
-                ShapingFunctionPlot.Series.Add(new FunctionSeries(shapingFunction, -1, 1, 100, "f(x)"));
+                //ShapingFunctionPlot.Series.Add(new FunctionSeries(shapingFunction, -1, 1, 1000, "f(x)"));
+                ShapingFunctionPlot.Series.Add(new FunctionSeries(shapingFunction, 0, 1, 100, "f(x)"));
                 ShapingFunctionPlot.InvalidatePlot(true);
             }
             catch (PiecewiseFunctionInputOutOfRange)
@@ -202,6 +215,9 @@ namespace WaveShaper
                     break;
                 case ProcessingType.PiecewisePolynomial:
                     func = BuildPiecewisePolynomial(Rows).Calculate;
+                    break;
+                case ProcessingType.Bezier:
+                    func = BuildBezierFunction(Bezier.GetCurves()).Calculate;
                     break;
             }
 
@@ -239,6 +255,35 @@ namespace WaveShaper
                     Function = row.GetPolynomialFunction()
                 });
             }
+
+            function.Preprocess = x => x.Clamp(-1, 1);
+            return function;
+        }
+
+        private static PiecewiseFunction<double> BuildBezierFunction(IEnumerable<BezierCurve> curves)
+        {
+            var function = new PiecewiseFunction<double>();
+
+            foreach (var curve in curves.OrderBy(c => c.P0.X))
+            {
+                var func = curve.GetFunctionOfX();
+                function.AddPiece(new Piece<double>
+                {
+                    Condition = x => curve.P0.X <= x && x <= curve.P3.X,
+                    Function = func
+                });
+                //function.AddPiece(new Piece<double>
+                //{
+                //    Condition = x => -curve.EndPoint.X <= x && x <= -curve.StartPoint.X,
+                //    Function = func
+                //});
+            }
+
+            function.AddPiece(new Piece<double>
+            {
+                Condition = x => true,
+                Function = x => 0
+            });
 
             function.Preprocess = x => x.Clamp(-1, 1);
             return function;
