@@ -52,18 +52,6 @@ namespace WaveShaper
             InitialisePlot();
             InitializeComponent();
             PlotShapingFunction(Player.ShapingFunction);
-
-
-            //var bc = new BezierCurve()
-            //{
-            //    StartPoint = new Point(0, 0),
-            //    StartPointHandle = new Point(0.1, 0.1),
-            //    EndPointHandle = new Point(0.9, 0.9),
-            //    EndPoint = new Point(1, 1)
-            //};
-
-            //var y = CubicEquation.SolveBezier(bc, 0.1);
-
         }
 
         private void InitialisePlot()
@@ -76,24 +64,24 @@ namespace WaveShaper
                 TitleFont = "Segoe UI",
                 TitleFontWeight = 1
             };
-            //shapingFunctionPlot.Axes.Add(new LinearAxis
-            //                   {
-            //                       Position = AxisPosition.Left,
-            //                       Minimum = -1.1,
-            //                       Maximum = 1.1,
-            //                       ExtraGridlines = new[] {0d},
-            //                       ExtraGridlineColor = OxyColors.LightGray,
-            //                       Title = "f(x)"
-            //});
-            //shapingFunctionPlot.Axes.Add(new LinearAxis
-            //                   {
-            //                       Position = AxisPosition.Bottom,
-            //                       Minimum = -1.1,
-            //                       Maximum = 1.1,
-            //                       ExtraGridlines = new[] {0d},
-            //                       ExtraGridlineColor = OxyColors.LightGray,
-            //                       Title = "x"
-            //});
+            shapingFunctionPlot.Axes.Add(new LinearAxis
+            {
+                Position = AxisPosition.Left,
+                Minimum = -1.1,
+                Maximum = 1.1,
+                ExtraGridlines = new[] { 0d },
+                ExtraGridlineColor = OxyColors.LightGray,
+                Title = "f(x)"
+            });
+            shapingFunctionPlot.Axes.Add(new LinearAxis
+            {
+                Position = AxisPosition.Bottom,
+                Minimum = -1.1,
+                Maximum = 1.1,
+                ExtraGridlines = new[] { 0d },
+                ExtraGridlineColor = OxyColors.LightGray,
+                Title = "x"
+            });
         }
 
         public ObservableCollection<PiecewiseFunctionRow> Rows
@@ -190,8 +178,7 @@ namespace WaveShaper
             try
             {
                 ShapingFunctionPlot.Series.Clear();
-                //ShapingFunctionPlot.Series.Add(new FunctionSeries(shapingFunction, -1, 1, 1000, "f(x)"));
-                ShapingFunctionPlot.Series.Add(new FunctionSeries(shapingFunction, 0, 1, 100, "f(x)"));
+                ShapingFunctionPlot.Series.Add(new FunctionSeries(shapingFunction, -1, 1, 100, "f(x)"));
                 ShapingFunctionPlot.InvalidatePlot(true);
             }
             catch (PiecewiseFunctionInputOutOfRange)
@@ -272,11 +259,11 @@ namespace WaveShaper
                     Condition = x => curve.P0.X <= x && x <= curve.P3.X,
                     Function = func
                 });
-                //function.AddPiece(new Piece<double>
-                //{
-                //    Condition = x => -curve.EndPoint.X <= x && x <= -curve.StartPoint.X,
-                //    Function = func
-                //});
+                function.AddPiece(new Piece<double>
+                {
+                    Condition = x => -curve.P3.X <= x && x <= -curve.P0.X,
+                    Function = func
+                });
             }
 
             function.AddPiece(new Piece<double>

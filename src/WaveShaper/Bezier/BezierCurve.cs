@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows;
+using MathNet.Numerics.RootFinding;
 using WaveShaper.Utilities;
 
 namespace WaveShaper.Bezier
@@ -21,36 +23,61 @@ namespace WaveShaper.Bezier
                 bool neg = x < 0;
                 x = Math.Abs(x);
 
-                double r = CubicEquation.SolveBezier(this, x);
+                double r = SolveBezierAtX(this, x);
                 return neg ? -r : r;
             };
         }
 
-        //public Func<double, double> GetFunctionOfX()
-        //{
-        //    double y0 = StartPoint.Y;
-        //    double y1 = StartPointHandle.Y;
-        //    double y2 = EndPointHandle.Y;
-        //    double y3 = EndPoint.Y;
-        //    return x =>
-        //    {
-        //        bool neg = x < 0;
-        //        x = Math.Abs(x);
+        private static double SolveBezierAtX(BezierCurve bc, double x)
+        {
+            // B(t) = (1-t)^3 P0 + 3 (1-t)^2 t P1 + 3 (1-t) t^2 P2 + t^3 P3 = x
+            // (-P0 + 3 P1 - 3 P2 + P3) t^3 + (3 P0 - 6 P1 + 3 P2) t^2 + (-3 P0 + 3 P1) t + (P0 - x) = 0 
+            // a t^3 + b t^2 + c t + d = 0
+            double a = -bc.P0.X + 3 * bc.P1.X - 3 * bc.P2.X + bc.P3.X;
+            double b = 3 * bc.P0.X - 6 * bc.P1.X + 3 * bc.P2.X;
+            double c = -3 * bc.P0.X + 3 * bc.P1.X;
+            double d = bc.P0.X - x;
 
-        //        double oneMinusX = 1.0 - x;
+            b /= a;
+            c /= a;
+            d /= a;
 
-        //        //double r = oneMinusX * oneMinusX * oneMinusX * y0
-        //        //           + 3 * oneMinusX * oneMinusX * x * y1
-        //        //           + 3 * oneMinusX * x * x * y2
-        //        //           + x * x * x * y3;
+            var roots = Cubic.RealRoots(d, c, b);
 
-        //        double r = (1 - x*x*x) * y0
-        //                  + 3 * (1 - x*x) * x * y1
-        //                  + 3 * (1-x) * x * x * y2
-        //                  + x * x * x * y3;
+            //Debug.WriteLine($"  ROOTS {roots}");
 
-        //        return neg ? -r : r;
-        //    };
-        //}
+            double? root = null;
+            double? rootBackup = null;
+
+            foreach (double r in roots.AsEnumerable())
+            {
+                if (double.IsNaN(r))
+                    continue;
+
+                if (rootBackup == null)
+                    rootBackup = r;
+
+                if (0 <= r && r <= 1)
+                {
+                    root = r;
+                    break;
+                }
+            }
+
+            if (root == null)
+            {
+                root = rootBackup;
+                Debug.WriteLine("Taking backup root " + rootBackup);
+            }
+
+            if (root == null)
+                throw new Exception("No root found. " + roots);
+
+            double t = root.Value;
+            double tt = 1 - t;
+
+            double y = tt * tt * tt * bc.P0.Y + 3 * tt * tt * t * bc.P1.Y + 3 * tt * t * t * bc.P2.Y + t * t * t * bc.P3.Y;
+            return y;
+        }
     }
 }

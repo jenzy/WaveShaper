@@ -17,7 +17,7 @@ namespace WaveShaper.Bezier
     /// </summary>
     public partial class BezierControl : UserControl
     {
-        private const double Offset = 10;
+        private const double Offset = 20;
         private readonly List<BezierFigure> bezierFigures = new List<BezierFigure>();
 
         public BezierControl()
@@ -33,12 +33,12 @@ namespace WaveShaper.Bezier
 
             foreach (var bf in bezierFigures)
             {
-                Debug.WriteLine($"{bf.StartPoint} {bf.StartBezierPoint} {bf.EndBezierPoint} {bf.EndPoint}");
+                //Debug.WriteLine($"{bf.StartPoint} {bf.StartBezierPoint} {bf.EndBezierPoint} {bf.EndPoint}");
 
                 var c = ConvertFigureToCurve(bf);
                 list.Add(c);
 
-                Debug.WriteLine($"{c.P0} {c.P1} {c.P2} {c.P3}");
+                //Debug.WriteLine($"{c.P0} {c.P1} {c.P2} {c.P3}");
             }
 
             return list;
@@ -130,7 +130,7 @@ namespace WaveShaper.Bezier
             if (bezierFigures.Count == 0)
                 return;
 
-            var bf = bezierFigures[0];
+            //var bf = bezierFigures[0];
             var bc = ConvertFigureToCurve(bezierFigures[0]);
             Debug.WriteLine($"{bc.P0} {bc.P1} {bc.P2} {bc.P3}");
 

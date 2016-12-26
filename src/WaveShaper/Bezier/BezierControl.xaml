@@ -112,7 +112,7 @@
         </Canvas>
       </Border>
     </DockPanel>
-    <Button Content="Debug" Click="ButtonBase_OnClick" Height="20" VerticalAlignment="Bottom"></Button>
+    <!--<Button Content="Debug" Click="ButtonBase_OnClick" Height="20" VerticalAlignment="Bottom"></Button>-->
   </Grid>
   
 </UserControl>
