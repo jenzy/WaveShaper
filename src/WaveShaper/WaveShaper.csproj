@@ -98,9 +98,11 @@
     <Compile Include="Utilities\DropDownButtonBehaviour.cs" />
     <Compile Include="Utilities\EnumUtil.cs" />
     <Compile Include="Utilities\Extensions.cs" />
+    <Compile Include="Utilities\PointExtensions.cs" />
     <Compile Include="Utilities\TupleExtensions.cs" />
     <Compile Include="Utilities\WaitCursor.cs" />
     <Compile Include="Utilities\WpfEnumDisplayConverter.cs" />
+    <Compile Include="Utilities\WpfUtil.cs" />
     <Compile Include="WaveSample.cs" />
     <Compile Include="Windows\DebugPlot.xaml.cs">
       <DependentUpon>DebugPlot.xaml</DependentUpon>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Windows;
 using MathNet.Numerics.RootFinding;
 using WaveShaper.Utilities;
@@ -28,7 +27,35 @@ namespace WaveShaper.Bezier
             };
         }
 
-        private static double SolveBezierAtX(BezierCurve bc, double x)
+        public Tuple<BezierCurve, BezierCurve> Split(Point p)
+        {
+            var p0 = new CalcPoint(this.P0);
+            var p1 = new CalcPoint(this.P1);
+            var p2 = new CalcPoint(this.P2);
+            var p3 = new CalcPoint(this.P3);
+            double t = GetBezierT(this, p.X);
+            double u = 1 - t;
+
+            var c1 = new BezierCurve
+            {
+                P0 = p0.Point,
+                P1 = ((t * p1) + (u * p0)).Point,
+                P2 = ((t * t * p2) + (2 * t * u * p1) + (u * u * p0)).Point,
+                P3 = ((t * t * t * p3) + (3 * t * t * u * p2) + (3 * t * u * u * p1) + (u * u * u * p0)).Point,
+            };
+
+            var c2 = new BezierCurve
+            {
+                P0 = (t * t * t * p3 + 3 * t * t * u * p2 + 3 * t * u * u * p1 + u * u * u * p0).Point,
+                P1 = (t * t * p3 + 2 * t * u * p2 + u * u * p1).Point,
+                P2 = (t * p3 + u * p2).Point,
+                P3 = p3.Point,
+            };
+
+            return Tuple.Create(c1, c2);
+        }
+
+        private static double GetBezierT(BezierCurve bc, double x)
         {
             // B(t) = (1-t)^3 P0 + 3 (1-t)^2 t P1 + 3 (1-t) t^2 P2 + t^3 P3 = x
             // (-P0 + 3 P1 - 3 P2 + P3) t^3 + (3 P0 - 6 P1 + 3 P2) t^2 + (-3 P0 + 3 P1) t + (P0 - x) = 0 
@@ -43,8 +70,6 @@ namespace WaveShaper.Bezier
             d /= a;
 
             var roots = Cubic.RealRoots(d, c, b);
-
-            //Debug.WriteLine($"  ROOTS {roots}");
 
             double? root = null;
             double? rootBackup = null;
@@ -65,15 +90,17 @@ namespace WaveShaper.Bezier
             }
 
             if (root == null)
-            {
                 root = rootBackup;
-                Debug.WriteLine("Taking backup root " + rootBackup);
-            }
 
             if (root == null)
                 throw new Exception("No root found. " + roots);
 
-            double t = root.Value;
+            return root.Value;
+        }
+
+        private static double SolveBezierAtX(BezierCurve bc, double x)
+        {
+            double t = GetBezierT(bc, x);
             double tt = 1 - t;
 
             double y = tt * tt * tt * bc.P0.Y + 3 * tt * tt * t * bc.P1.Y + 3 * tt * t * t * bc.P2.Y + t * t * t * bc.P3.Y;

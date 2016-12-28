@@ -10,10 +10,16 @@ namespace WaveShaper.Bezier
         /// StartPoint Dependency Property
         /// </summary>
         public static readonly DependencyProperty StartPointProperty = DependencyProperty.Register(
-                "StartPoint",
+                nameof(StartPoint),
                 typeof(Point),
                 typeof(BezierFigure),
-                new FrameworkPropertyMetadata(new Point()));
+                new FrameworkPropertyMetadata(new Point(), StartPointChanged));
+
+        private static void StartPointChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        {
+            var bf = dependencyObject as BezierFigure;
+            bf?.PreviousFigure?.SetPointFromNeighbour(EndPointProperty, (Point) dependencyPropertyChangedEventArgs.NewValue);
+        }
 
         /// <summary>
         /// Gets or sets the StartPoint property
@@ -21,7 +27,11 @@ namespace WaveShaper.Bezier
         public Point StartPoint
         {
             get { return (Point)GetValue(StartPointProperty); }
-            set { SetValue(StartPointProperty, value); }
+            set
+            {
+                SetValue(StartPointProperty, value);
+                PreviousFigure?.SetPointFromNeighbour(EndPointProperty, value);
+            }
         }
         #endregion
 
@@ -30,10 +40,16 @@ namespace WaveShaper.Bezier
         /// EndPoint Dependency Property
         /// </summary>
         public static readonly DependencyProperty EndPointProperty = DependencyProperty.Register(
-                "EndPoint",
+                nameof(EndPoint),
                 typeof(Point),
                 typeof(BezierFigure),
-                new FrameworkPropertyMetadata(new Point()));
+                new FrameworkPropertyMetadata(new Point(), EndPointChanged));
+
+        private static void EndPointChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        {
+            var bf = dependencyObject as BezierFigure;
+            bf?.NextFigure?.SetPointFromNeighbour(StartPointProperty, (Point)dependencyPropertyChangedEventArgs.NewValue);
+        }
 
         /// <summary>
         /// Gets or sets the EndPoint property
@@ -41,7 +57,11 @@ namespace WaveShaper.Bezier
         public Point EndPoint
         {
             get { return (Point)GetValue(EndPointProperty); }
-            set { SetValue(EndPointProperty, value); }
+            set
+            {
+                SetValue(EndPointProperty, value);
+                NextFigure?.SetPointFromNeighbour(StartPointProperty, value);
+            }
         }
         #endregion
 
@@ -50,7 +70,7 @@ namespace WaveShaper.Bezier
         /// StartBezierPoint Dependency Property
         /// </summary>
         public static readonly DependencyProperty StartBezierPointProperty = DependencyProperty.Register(
-                "StartBezierPoint",
+                nameof(StartBezierPoint),
                 typeof(Point),
                 typeof(BezierFigure),
                 new FrameworkPropertyMetadata(new Point()));
@@ -70,10 +90,13 @@ namespace WaveShaper.Bezier
         /// StartBezierPoint Dependency Property
         /// </summary>
         public static readonly DependencyProperty EndBezierPointProperty = DependencyProperty.Register(
-                "EndBezierPoint",
+                nameof(EndBezierPoint),
                 typeof(Point),
                 typeof(BezierFigure),
                 new FrameworkPropertyMetadata(new Point()));
+
+        private BezierFigure previousFigure;
+        private BezierFigure nextFigure;
 
         /// <summary>
         /// Gets or sets the StartBezierPoint property
@@ -84,6 +107,39 @@ namespace WaveShaper.Bezier
             set { SetValue(EndBezierPointProperty, value); }
         }
         #endregion
+
+        public BezierFigure PreviousFigure
+        {
+            get { return previousFigure; }
+            set
+            {
+                // ReSharper disable once PossibleUnintendedReferenceComparison
+                if (previousFigure == value)
+                    return;
+
+                previousFigure = value;
+                value.NextFigure = this;
+            }
+        }
+
+        public BezierFigure NextFigure
+        {
+            get { return nextFigure; }
+            set
+            {
+                // ReSharper disable once PossibleUnintendedReferenceComparison
+                if (nextFigure == value)
+                    return;
+
+                nextFigure = value;
+                value.PreviousFigure = this;
+            }
+        }
+
+        private void SetPointFromNeighbour(DependencyProperty propery, Point p)
+        {
+            SetValue(propery, p);
+        }
 
         static BezierFigure()
         {

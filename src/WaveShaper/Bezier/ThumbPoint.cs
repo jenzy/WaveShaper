@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using WaveShaper.Utilities;
 
 namespace WaveShaper.Bezier
 {
@@ -15,10 +17,12 @@ namespace WaveShaper.Bezier
         /// Point Dependency Property
         /// </summary>
         public static readonly DependencyProperty PointProperty = DependencyProperty.Register(
-            "Point",
+            nameof(Point),
             typeof(Point),
             typeof(ThumbPoint),
             new FrameworkPropertyMetadata(new Point()));
+
+        private BezierControl bezierControl;
 
         /// <summary>
         /// Gets or sets the Point property
@@ -31,6 +35,8 @@ namespace WaveShaper.Bezier
 
         #endregion
 
+        private BezierControl BezierControl => bezierControl ?? (bezierControl = WpfUtil.FindParent<BezierControl>(this));
+
         static ThumbPoint()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ThumbPoint), new FrameworkPropertyMetadata(typeof(ThumbPoint)));
@@ -39,11 +45,29 @@ namespace WaveShaper.Bezier
         public ThumbPoint()
         {
             this.DragDelta += this.OnDragDelta;
+            this.Loaded += OnLoaded;
+            Cursor = Cursors.Hand;
+        }
+
+        private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
+        {
+            UpdateTooltip();
         }
 
         private void OnDragDelta(object sender, DragDeltaEventArgs e)
         {
             this.Point = new Point(this.Point.X + e.HorizontalChange, this.Point.Y + e.VerticalChange);
+            UpdateTooltip();
         }
+
+        private void UpdateTooltip()
+        {
+            if (BezierControl == null)
+                return;
+
+            var p = BezierControl.ConvertPointFromCanvas(this.Point);
+            ToolTip = $"X: {p.X:0.####}\nY: {p.Y:0.####}";
+        }
+
     }
 }

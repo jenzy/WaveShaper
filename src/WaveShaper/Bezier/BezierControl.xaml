@@ -14,7 +14,7 @@
             <Canvas Background="AliceBlue">
 
               <!-- render the BezierSegment itself -->
-              <Path Stroke="Red" StrokeThickness="2" >
+              <Path Stroke="Red" StrokeThickness="2" Cursor="Cross" MouseLeftButtonUp="BezierFigure_OnMouseLeftButtonUp">
                 <Path.Data>
                   <PathGeometry>
                     <PathGeometry.Figures>

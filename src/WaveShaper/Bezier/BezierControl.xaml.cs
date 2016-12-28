@@ -4,11 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using OxyPlot;
-using OxyPlot.Series;
-using WaveShaper.Windows;
+using WaveShaper.Utilities;
 
 namespace WaveShaper.Bezier
 {
@@ -17,7 +16,7 @@ namespace WaveShaper.Bezier
     /// </summary>
     public partial class BezierControl : UserControl
     {
-        private const double Offset = 20;
+        private const double Offset = 30;
         private readonly List<BezierFigure> bezierFigures = new List<BezierFigure>();
 
         public BezierControl()
@@ -27,23 +26,7 @@ namespace WaveShaper.Bezier
             Loaded += OnLoaded;
         }
 
-        public IEnumerable<BezierCurve> GetCurves()
-        {
-            var list = new List<BezierCurve>();
-
-            foreach (var bf in bezierFigures)
-            {
-                //Debug.WriteLine($"{bf.StartPoint} {bf.StartBezierPoint} {bf.EndBezierPoint} {bf.EndPoint}");
-
-                var c = ConvertFigureToCurve(bf);
-                list.Add(c);
-
-                //Debug.WriteLine($"{c.P0} {c.P1} {c.P2} {c.P3}");
-            }
-
-            return list;
-            //return bezierFigures.Select(ConvertFigureToCurve);
-        }
+        public IEnumerable<BezierCurve> GetCurves() => bezierFigures.Select(ConvertFigureToCurve).ToList();
 
         private Size AreaSize { get; set; }
 
@@ -52,18 +35,24 @@ namespace WaveShaper.Bezier
         private double AreaBottom => Offset + AreaSize.Height;
         private double AreaLeft => Offset;
 
-        private BezierCurve ConvertFigureToCurve(BezierFigure figure)
+        private BezierCurve ConvertFigureToCurve(BezierFigure figure) => new BezierCurve
         {
-            return new BezierCurve
-            {
-                P0 = ConvertPointFromCanvas(figure.StartPoint),
-                P1 = ConvertPointFromCanvas(figure.StartBezierPoint),
-                P2 = ConvertPointFromCanvas(figure.EndBezierPoint),
-                P3 = ConvertPointFromCanvas(figure.EndPoint)
-            };
-        }
+            P0 = ConvertPointFromCanvas(figure.StartPoint),
+            P1 = ConvertPointFromCanvas(figure.StartBezierPoint),
+            P2 = ConvertPointFromCanvas(figure.EndBezierPoint),
+            P3 = ConvertPointFromCanvas(figure.EndPoint)
+        };
 
-        private Point ConvertPointFromCanvas(Point canvasPoint)
+        private BezierFigure ConvertCurveToFigure(BezierCurve curve) => new BezierFigure
+        {
+            StartPoint = ConvertPointToCanvas(curve.P0),
+            StartBezierPoint = ConvertPointToCanvas(curve.P1),
+            EndBezierPoint = ConvertPointToCanvas(curve.P2),
+            EndPoint = ConvertPointToCanvas(curve.P3)
+        };
+
+
+        internal Point ConvertPointFromCanvas(Point canvasPoint)
         {
             double x = (canvasPoint.X - AreaLeft) / AreaSize.Width;
             double y = 1.0 - ((canvasPoint.Y - AreaTop) / AreaSize.Height);
@@ -86,17 +75,28 @@ namespace WaveShaper.Bezier
 
             if (!bezierFigures.Any())
             {
-                var bf = new BezierFigure
+                var bc = new BezierCurve()
                 {
-                    StartPoint = ConvertPointToCanvas(new Point(0, 0)),
-                    StartBezierPoint = ConvertPointToCanvas(new Point(0.1, 0.1)),
-                    EndBezierPoint = ConvertPointToCanvas(new Point(0.9, 0.9)),
-                    EndPoint = ConvertPointToCanvas(new Point(1, 1)),
+                    P0 = new Point(0, 0),
+                    P1 = new Point(0.1, 0.1),
+                    P2 = new Point(0.9, 0.9),
+                    P3 = new Point(1, 1)
                 };
 
-                Canvas.Children.Add(bf);
-                bezierFigures.Add(bf);
+               AddFigure(ConvertCurveToFigure(bc));
             }
+        }
+
+        private void AddFigure(BezierFigure f)
+        {
+            Canvas.Children.Add(f);
+            bezierFigures.Add(f);
+        }
+
+        private void RemoveFigure(BezierFigure f)
+        {
+            Canvas.Children.Remove(f);
+            bezierFigures.Remove(f);
         }
 
         private void InitCanvasBorder()
@@ -125,42 +125,27 @@ namespace WaveShaper.Bezier
             Debug.WriteLine($"Area: {AreaTop}, {AreaRight}, {AreaBottom}, {AreaLeft}");
         }
 
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        private void BezierFigure_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (bezierFigures.Count == 0)
-                return;
+            Point p = ConvertPointFromCanvas(e.GetPosition(Canvas));
+            BezierFigure bf = WpfUtil.FindParent<BezierFigure>(e.Source as DependencyObject);
+            BezierCurve bc = ConvertFigureToCurve(bf);
 
-            //var bf = bezierFigures[0];
-            var bc = ConvertFigureToCurve(bezierFigures[0]);
-            Debug.WriteLine($"{bc.P0} {bc.P1} {bc.P2} {bc.P3}");
+            var newCurves = bc.Split(p);
+            var bf1 = ConvertCurveToFigure(newCurves.Item1);
+            var bf2 = ConvertCurveToFigure(newCurves.Item2);
 
-            var pm = new PlotModel();
-            var ls1 = new LineSeries();
+            if (bf.PreviousFigure != null)
+                bf1.PreviousFigure = bf.PreviousFigure;
 
-            for (double t = 0; t < 1; t+=0.01)
-            {
-                double tt = 1 - t;
+            bf1.NextFigure = bf2;
 
-                //var x = bc.P0.X + bc.P1.X * t + bc.P2.X * t * t + bc.P3.X * t * t * t;
-                //var y = bc.P0.Y + bc.P1.Y * t + bc.P2.Y * t * t + bc.P3.Y * t * t * t;
+            if (bf.NextFigure != null)
+                bf2.NextFigure = bf.NextFigure;
 
-                //var x = bf.StartPoint.X + bf.StartBezierPoint.X * t + bf.EndBezierPoint.X * t * t + bf.EndPoint.X * t * t * t;
-                //var y = bf.StartPoint.Y + bf.StartBezierPoint.Y * t + bf.EndBezierPoint.Y * t * t + bf.EndPoint.Y * t * t * t;
-
-                //var x = bf.EndPoint.X + bf.EndBezierPoint.X * t + bf.StartBezierPoint.X * t * t + bf.StartPoint.X * t * t * t;
-                //var y = bf.EndPoint.Y + bf.EndBezierPoint.Y * t + bf.StartBezierPoint.Y * t * t + bf.StartPoint.Y * t * t * t;
-
-                var x = bc.P0.X * tt * tt * tt + 3 * bc.P1.X * tt * tt * t + 3 * bc.P2.X * tt * t * t + bc.P3.X * t * t * t;
-                var y = bc.P0.Y * tt * tt * tt + 3 * bc.P1.Y * tt * tt * t + 3 * bc.P2.Y * tt * t * t + bc.P3.Y * t * t * t;
-
-                ls1.Points.Add(new DataPoint(x, y));
-            }
-
-            pm.Series.Add(ls1);
-
-            var w = new DebugPlot(pm);
-            w.Show();
-
+            RemoveFigure(bf);
+            AddFigure(bf1);
+            AddFigure(bf2);
         }
     }
 }
