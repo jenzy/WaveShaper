@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WaveShaper.Bezier"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="300"
+             DataContext="{Binding RelativeSource={RelativeSource Self}}">
   <Control.Resources>
     <Style TargetType="{x:Type local:BezierFigure}">
       <Setter Property="Template">
@@ -101,18 +102,14 @@
     </Style>
   </Control.Resources>
   <Grid>
-    <DockPanel>
-      <Border DockPanel.Dock="Top" BorderBrush="Black" BorderThickness="0">
-        <Canvas ClipToBounds="True" x:Name="Canvas">
-          <!--<local:BezierFigure x:Name="BezierFigure"
-                    StartPoint="40,80"
-                    StartBezierPoint="100,300"
-                    EndBezierPoint="400,80"
-                    EndPoint="450,300"/>-->
-        </Canvas>
+    <Grid>
+      <Border BorderBrush="Black" BorderThickness="0">
+        <Canvas ClipToBounds="True" x:Name="Canvas" />
       </Border>
-    </DockPanel>
-    <!--<Button Content="Debug" Click="ButtonBase_OnClick" Height="20" VerticalAlignment="Bottom"></Button>-->
+    </Grid>
+    <StackPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Right" Margin="10" >
+      <Button x:Name="ButtonUndo" Content="↶" MinWidth="20" MinHeight="20" VerticalAlignment="Center" ToolTip="Undo"/>
+    </StackPanel>
   </Grid>
-  
+
 </UserControl>

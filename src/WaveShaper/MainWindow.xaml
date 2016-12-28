@@ -13,7 +13,6 @@
         Title="WaveShaper" Height="600" Width="900" 
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Window.Resources>
-        <!--<utils:WpfEnumDisplayConverter x:Key="EnumConverter"/>-->
         <ObjectDataProvider x:Key="DpProcessingTypes" MethodName="AllValuesForDdl" ObjectType="utils:EnumUtil">
             <ObjectDataProvider.MethodParameters>
                 <x:TypeExtension TypeName="local:ProcessingType" />
@@ -28,6 +27,9 @@
     <Window.CommandBindings>
         <CommandBinding Command="local:CustomCommands.Preset" Executed="CommandBinding_OnExecuted" />
     </Window.CommandBindings>
+  <Window.InputBindings>
+    <KeyBinding Command="{Binding ElementName=Bezier, Path=UndoCommand}" Key="Z" Modifiers="Control"></KeyBinding>
+  </Window.InputBindings>
 
     <Grid>
         <controls:Player Margin="10,10,10,0" VerticalAlignment="Top" x:Name="Player" />

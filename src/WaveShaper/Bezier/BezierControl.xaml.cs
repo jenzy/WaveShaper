@@ -18,12 +18,16 @@ namespace WaveShaper.Bezier
     {
         private const double Offset = 30;
         private readonly List<BezierFigure> bezierFigures = new List<BezierFigure>();
+        private readonly Stack<List<BezierCurve>> stack = new Stack<List<BezierCurve>>();
 
         public BezierControl()
         {
             InitializeComponent();
 
             Loaded += OnLoaded;
+
+            UndoCommand = new UndoCommand(RestoreStateFromStack, stack);
+            ButtonUndo.Command = UndoCommand;
         }
 
         public IEnumerable<BezierCurve> GetCurves() => bezierFigures.Select(ConvertFigureToCurve).ToList();
@@ -37,14 +41,18 @@ namespace WaveShaper.Bezier
 
         private BezierCurve ConvertFigureToCurve(BezierFigure figure) => new BezierCurve
         {
+            Id = figure.Id,
             P0 = ConvertPointFromCanvas(figure.StartPoint),
             P1 = ConvertPointFromCanvas(figure.StartBezierPoint),
             P2 = ConvertPointFromCanvas(figure.EndBezierPoint),
-            P3 = ConvertPointFromCanvas(figure.EndPoint)
+            P3 = ConvertPointFromCanvas(figure.EndPoint),
+            Next = figure.NextFigure?.Id,
+            Prev = figure.PreviousFigure?.Id
         };
 
         private BezierFigure ConvertCurveToFigure(BezierCurve curve) => new BezierFigure
         {
+            Id = curve.Id,
             StartPoint = ConvertPointToCanvas(curve.P0),
             StartBezierPoint = ConvertPointToCanvas(curve.P1),
             EndBezierPoint = ConvertPointToCanvas(curve.P2),
@@ -54,15 +62,15 @@ namespace WaveShaper.Bezier
 
         internal Point ConvertPointFromCanvas(Point canvasPoint)
         {
-            double x = (canvasPoint.X - AreaLeft) / AreaSize.Width;
-            double y = 1.0 - ((canvasPoint.Y - AreaTop) / AreaSize.Height);
+            double x = (canvasPoint.X - AreaLeft)/AreaSize.Width;
+            double y = 1.0 - ((canvasPoint.Y - AreaTop)/AreaSize.Height);
             return new Point(x, y);
         }
 
         private Point ConvertPointToCanvas(Point point)
         {
-            double x = point.X * AreaSize.Width + AreaLeft;
-            double y = (1.0 - point.Y) * AreaSize.Height + AreaTop;
+            double x = point.X*AreaSize.Width + AreaLeft;
+            double y = (1.0 - point.Y)*AreaSize.Height + AreaTop;
             return new Point(x, y);
         }
 
@@ -83,7 +91,7 @@ namespace WaveShaper.Bezier
                     P3 = new Point(1, 1)
                 };
 
-               AddFigure(ConvertCurveToFigure(bc));
+                AddFigure(ConvertCurveToFigure(bc));
             }
         }
 
@@ -106,7 +114,7 @@ namespace WaveShaper.Bezier
                 return;
 
             double min = Math.Min(size.Height, size.Width);
-            min -= 2 * Offset;
+            min -= 2*Offset;
             AreaSize = new Size(min, min);
 
             var rect = new Rectangle
@@ -127,6 +135,8 @@ namespace WaveShaper.Bezier
 
         private void BezierFigure_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            SaveStateToStack();
+
             Point p = ConvertPointFromCanvas(e.GetPosition(Canvas));
             BezierFigure bf = WpfUtil.FindParent<BezierFigure>(e.Source as DependencyObject);
             BezierCurve bc = ConvertFigureToCurve(bf);
@@ -146,6 +156,36 @@ namespace WaveShaper.Bezier
             RemoveFigure(bf);
             AddFigure(bf1);
             AddFigure(bf2);
+        }
+
+        public UndoCommand UndoCommand { get; set; }
+
+        private void SaveStateToStack()
+        {
+            var curves = GetCurves().ToList();
+            stack.Push(curves);
+            UndoCommand.OnCanExecuteChanged();
+        }
+
+        private void RestoreStateFromStack()
+        {
+            if (stack.Count == 0)
+                return;
+
+            var curves = stack.Pop();
+            var newFigures = curves.Select(ConvertCurveToFigure).ToDictionary(f => f.Id, f => f);
+
+            foreach (var bf in bezierFigures.ToArray())
+                RemoveFigure(bf);
+
+            foreach (var c in curves.Where(c => c.Next != null))
+            {
+                // ReSharper disable once PossibleInvalidOperationException
+                newFigures[c.Id].NextFigure = newFigures[c.Next.Value];
+            }
+
+            foreach (var bf in newFigures.Values)
+                AddFigure(bf);
         }
     }
 }

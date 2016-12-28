@@ -1,10 +1,13 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace WaveShaper.Bezier
 {
     public class BezierFigure : Control
     {
+        public Guid Id { get; set; } = Guid.NewGuid();
+
         #region StartPoint
         /// <summary>
         /// StartPoint Dependency Property

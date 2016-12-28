@@ -7,6 +7,8 @@ namespace WaveShaper.Bezier
 {
     public class BezierCurve
     {
+        public Guid Id { get; set; } = Guid.NewGuid();
+
         public Point P0 { get; set; }
 
         public Point P1 { get; set; }
@@ -14,6 +16,10 @@ namespace WaveShaper.Bezier
         public Point P2 { get; set; }
 
         public Point P3 { get; set; }
+
+        public Guid? Next { get; set; }
+
+        public Guid? Prev { get; set; }
 
         public Func<double, double> GetFunctionOfX()
         {
