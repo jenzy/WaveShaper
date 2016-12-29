@@ -103,9 +103,18 @@
   </Control.Resources>
   <Grid>
     <Grid>
-      <Border BorderBrush="Black" BorderThickness="0">
-        <Canvas ClipToBounds="True" x:Name="Canvas" MouseMove="Canvas_OnMouseMove" ToolTip="Test" />
-      </Border>
+        <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Hidden">
+        <Border BorderBrush="Black" BorderThickness="1">
+          <Canvas ClipToBounds="True" x:Name="Canvas" Background="White" Width="2000" Height="2000"
+                  MouseRightButtonDown="Canvas_OnMouseRightButtonDown"
+                  MouseMove="Canvas_OnMouseMove"
+                  MouseRightButtonUp="Canvas_OnMouseRightButtonUp">
+            <Canvas.RenderTransform>
+              <MatrixTransform x:Name="CanvasTransform"/>
+            </Canvas.RenderTransform>
+          </Canvas>
+        </Border>
+      </ScrollViewer>
     </Grid>
     <DockPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Margin="10" >
       <Button x:Name="ButtonUndo" DockPanel.Dock="Top"  Content="↶" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Right" ToolTip="Undo" Margin="2"/>

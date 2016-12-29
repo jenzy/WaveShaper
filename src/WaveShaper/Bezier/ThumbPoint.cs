@@ -53,8 +53,8 @@ namespace WaveShaper.Bezier
             this.Loaded += OnLoaded;
 
             // Thumb swallows mouse events, need to register with true, so we also receive handled events
-            this.AddHandler(MouseDownEvent, new MouseButtonEventHandler(OnMouseDown), true);
-            this.AddHandler(MouseUpEvent, new MouseButtonEventHandler(OnMouseUp), true);
+            this.AddHandler(MouseLeftButtonDownEvent, new MouseButtonEventHandler(OnMouseLeftButtonDown), true);
+            this.AddHandler(MouseLeftButtonUpEvent, new MouseButtonEventHandler(OnMouseLeftButtonUp), true);
 
             Cursor = Cursors.Hand;
         }
@@ -64,7 +64,7 @@ namespace WaveShaper.Bezier
             UpdateTooltip();
         }
 
-        private void OnMouseDown(object sender, MouseButtonEventArgs mouseButtonEventArgs)
+        private void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs mouseButtonEventArgs)
         {
             var p = Point;
             mouseMoveStartPoint = new Point(p.X, p.Y);
@@ -77,7 +77,7 @@ namespace WaveShaper.Bezier
             UpdateTooltip();
         }
 
-        private void OnMouseUp(object sender, MouseButtonEventArgs mouseButtonEventArgs)
+        private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs mouseButtonEventArgs)
         {
             var p = Point;
             if (p != mouseMoveStartPoint)

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -24,6 +23,8 @@ namespace WaveShaper.Bezier
         private readonly Stack<List<BezierCurve>> stackUndo = new Stack<List<BezierCurve>>();
         private readonly Stack<List<BezierCurve>> stackRedo = new Stack<List<BezierCurve>>();
         private string currentMousePosition;
+        private Point dragLastPoint;
+        private bool dragIsDragged;
 
         public BezierControl()
         {
@@ -49,11 +50,7 @@ namespace WaveShaper.Bezier
         }
 
         private Size AreaSize { get; set; }
-
-        private double AreaTop => Offset;
-        private double AreaRight => Offset + AreaSize.Width;
-        private double AreaBottom => Offset + AreaSize.Height;
-        private double AreaLeft => Offset;
+        private Point AreaTopLeft { get; set; }
 
         public ActionCommand UndoCommand { get; set; }
         public ActionCommand RedoCommand { get; set; }
@@ -94,15 +91,15 @@ namespace WaveShaper.Bezier
 
         internal Point ConvertPointFromCanvas(Point canvasPoint)
         {
-            double x = (canvasPoint.X - AreaLeft)/AreaSize.Width;
-            double y = 1.0 - (canvasPoint.Y - AreaTop)/AreaSize.Height;
+            double x = (canvasPoint.X - AreaTopLeft.X)/AreaSize.Width;
+            double y = 1.0 - (canvasPoint.Y - AreaTopLeft.Y)/AreaSize.Height;
             return new Point(x, y);
         }
 
         private Point ConvertPointToCanvas(Point point)
         {
-            double x = point.X*AreaSize.Width + AreaLeft;
-            double y = (1.0 - point.Y)*AreaSize.Height + AreaTop;
+            double x = point.X*AreaSize.Width + AreaTopLeft.X;
+            double y = (1.0 - point.Y)*AreaSize.Height + AreaTopLeft.Y;
             return new Point(x, y);
         }
 
@@ -124,7 +121,7 @@ namespace WaveShaper.Bezier
                     P0 = new Point(0, 0),
                     P1 = new Point(0.1, 0.1),
                     P2 = new Point(0.9, 0.9),
-                    P3 = new Point(1, 1)
+                    P3 = new Point(1.01, 1.01)
                 };
 
                 AddFigure(ConvertCurveToFigure(bc));
@@ -155,8 +152,9 @@ namespace WaveShaper.Bezier
 
         private void InitCanvasBorder()
         {
-            Size size = Canvas.RenderSize;
-            if (size == default(Size))
+            Size size = this.RenderSize;
+            Size canvaSize = Canvas.RenderSize;
+            if (size == default(Size) || canvaSize == default(Size))
                 return;
 
             double min = Math.Min(size.Height, size.Width);
@@ -171,12 +169,17 @@ namespace WaveShaper.Bezier
                 StrokeThickness = 1
             };
 
-            Canvas.Children.Add(rect);
-            Canvas.SetLeft(rect, Offset);
-            Canvas.SetTop(rect, Offset);
+            double areaLeft = (canvaSize.Width + AreaSize.Width)/2d;
+            double areaTop = (canvaSize.Height/2) - (AreaSize.Height/2);
+            AreaTopLeft = new Point(areaLeft, areaTop);
 
-            Debug.WriteLine($"Area size: {AreaSize}");
-            Debug.WriteLine($"Area: {AreaTop}, {AreaRight}, {AreaBottom}, {AreaLeft}");
+            Canvas.Children.Add(rect);
+            Canvas.SetLeft(rect, AreaTopLeft.X);
+            Canvas.SetTop(rect, AreaTopLeft.Y);
+
+            var m = new Matrix();
+            m.Translate(-AreaTopLeft.X + Offset, -AreaTopLeft.Y + Offset);
+            CanvasTransform.Matrix = m;
         }
 
         private void BezierFigure_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -242,6 +245,18 @@ namespace WaveShaper.Bezier
             p.Y = Math.Round(p.Y, 2);
 
             CurrentMousePosition = $"X: {p.X:0.00}\nY: {p.Y:0.00}";
+
+            if (!dragIsDragged)
+                return;
+
+            if (e.RightButton != MouseButtonState.Pressed || !Canvas.IsMouseCaptured)
+                return;
+
+            var pos = e.GetPosition(this);
+            var matrix = CanvasTransform.Matrix;
+            matrix.Translate(pos.X - dragLastPoint.X, pos.Y - dragLastPoint.Y);
+            CanvasTransform.Matrix = matrix;
+            dragLastPoint = pos;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -250,6 +265,19 @@ namespace WaveShaper.Bezier
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void Canvas_OnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Canvas.CaptureMouse();
+            dragLastPoint = e.GetPosition(this);
+            dragIsDragged = true;
+        }
+
+        private void Canvas_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Canvas.ReleaseMouseCapture();
+            dragIsDragged = false;
         }
     }
 }
