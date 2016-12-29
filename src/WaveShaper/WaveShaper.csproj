@@ -85,7 +85,7 @@
     </Compile>
     <Compile Include="Bezier\BezierCurve.cs" />
     <Compile Include="Bezier\BezierFigure.cs" />
-    <Compile Include="Bezier\Commands.cs" />
+    <Compile Include="Bezier\ActionCommand.cs" />
     <Compile Include="Bezier\ThumbPoint.cs" />
     <Compile Include="Controls\Player.xaml.cs">
       <DependentUpon>Player.xaml</DependentUpon>

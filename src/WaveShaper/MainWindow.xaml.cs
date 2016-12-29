@@ -47,6 +47,8 @@ namespace WaveShaper
             }
         };
 
+        private readonly Dictionary<ProcessingType, bool> mirroredPerMode = new Dictionary<ProcessingType, bool>();
+
         public MainWindow()
         {
             InitialisePlot();
@@ -114,24 +116,37 @@ namespace WaveShaper
             var previousType = (ProcessingType) e.RemovedItems.Cast<EnumUtil.EnumListItem>().Single().Value;
             var newType = (ProcessingType) e.AddedItems.Cast<EnumUtil.EnumListItem>().Single().Value;
 
+            bool mirroredNew;
+            if (!mirroredPerMode.TryGetValue(newType, out mirroredNew))
+                mirroredNew = true;
+            mirroredPerMode[previousType] = CbMirrored.IsChecked.HasValue && CbMirrored.IsChecked.Value;
+
             switch (newType)
             {
                 case ProcessingType.NoProcessing:
                     TabControl.SelectedItem = TabNone;
+                    CbMirrored.IsEnabled = false;
+                    CbMirrored.IsChecked = false;
                     break;
 
                 case ProcessingType.PiecewisePolynomial:
                     InitFunctionRows(previousType, newType);
                     TabControl.SelectedItem = TabTable;
+                    CbMirrored.IsEnabled = true;
+                    CbMirrored.IsChecked = mirroredNew;
                     break;
 
                 case ProcessingType.PiecewiseFunction:
                     InitFunctionRows(previousType, newType);
                     TabControl.SelectedItem = TabTable;
+                    CbMirrored.IsEnabled = true;
+                    CbMirrored.IsChecked = mirroredNew;
                     break;
 
                 case ProcessingType.Bezier:
                     TabControl.SelectedItem = TabBezier;
+                    CbMirrored.IsEnabled = false;
+                    CbMirrored.IsChecked = true;
                     break;
 
                 default:
@@ -190,6 +205,7 @@ namespace WaveShaper
         private Func<double, double> BuildFunction()
         {
             var mode = (ProcessingType)DdlProcessingType.SelectedValue;
+            bool mirrored = CbMirrored.IsChecked == true;
 
             Func<double, double> func = null;
             switch (mode)
@@ -198,10 +214,10 @@ namespace WaveShaper
                     func = ShapingSampleProvider.DefaultShapingFunction;
                     break;
                 case ProcessingType.PiecewiseFunction:
-                    func = BuildPiecewiseFunction(Rows).Calculate;
+                    func = BuildPiecewiseFunction(Rows, mirrored).Calculate;
                     break;
                 case ProcessingType.PiecewisePolynomial:
-                    func = BuildPiecewisePolynomial(Rows).Calculate;
+                    func = BuildPiecewisePolynomial(Rows, mirrored).Calculate;
                     break;
                 case ProcessingType.Bezier:
                     func = BuildBezierFunction(Bezier.GetCurves()).Calculate;
@@ -211,39 +227,68 @@ namespace WaveShaper
             return func;
         }
 
-        private static PiecewiseFunction<double> BuildPiecewiseFunction(IEnumerable<PiecewiseFunctionRow> rows)
+        private static PiecewiseFunction<double> BuildPiecewiseFunction(IEnumerable<PiecewiseFunctionRow> rows, bool mirrored = false)
         {
             var function = new PiecewiseFunction<double>();
+            var mirroredList = new List<Piece<double>>();
             var engine = new CalculationEngine();
             foreach (var row in rows)
             {
-                var piece = new Piece<double>
-                {
-                    Condition = row.GetCondition(),
-                    Function = (Func<double, double>)engine.Formula(row.Expression.Replace("pi", Math.PI.ToString(CultureInfo.InvariantCulture)))
+                var pieceFunction = (Func<double, double>) engine.Formula(row.Expression.Replace("pi", Math.PI.ToString(CultureInfo.InvariantCulture)))
                                                             .Parameter("x", DataType.FloatingPoint)
-                                                            .Result(DataType.FloatingPoint).Build()
-                };
-                function.AddPiece(piece);
+                                                            .Result(DataType.FloatingPoint).Build();
+
+                if (mirrored)
+                {
+                    function.AddPiece(new Piece<double>(row.GetCondition(inverted: false), x => pieceFunction(x)));
+                    mirroredList.Add(new Piece<double>(row.GetCondition(inverted: true), x => -pieceFunction(Math.Abs(x))));
+                }
+                else
+                {
+                    function.AddPiece(new Piece<double>(row.GetCondition(), pieceFunction));
+                }
             }
 
-            function.Preprocess = x => x.Clamp(-1, 1);
+            if (mirroredList.Any())
+            {
+                mirroredList.Reverse();
+                function.AddPieces(mirroredList);
+            }
+
+            function.AddPiece(Piece<double>.DefaultPiece);
+
+            //function.Preprocess = x => x.Clamp(-1, 1);
             return function;
         }
 
-        private static PiecewiseFunction<double> BuildPiecewisePolynomial(IEnumerable<PiecewiseFunctionRow> rows)
+        private static PiecewiseFunction<double> BuildPiecewisePolynomial(IEnumerable<PiecewiseFunctionRow> rows, bool mirrored = false)
         {
             var function = new PiecewiseFunction<double>();
+            var mirroredList = new List<Piece<double>>();
             foreach (var row in rows)
             {
-                function.AddPiece(new Piece<double>
+                var pieceFunction = row.GetPolynomialFunction();
+
+                if (mirrored)
                 {
-                    Condition = row.GetCondition(),
-                    Function = row.GetPolynomialFunction()
-                });
+                    function.AddPiece(new Piece<double>(row.GetCondition(inverted: false), x => pieceFunction(x)));
+                    mirroredList.Add(new Piece<double>(row.GetCondition(inverted: true), x => -pieceFunction(Math.Abs(x))));
+                }
+                else
+                {
+                    function.AddPiece(new Piece<double>(row.GetCondition(), pieceFunction));
+                }
             }
 
-            function.Preprocess = x => x.Clamp(-1, 1);
+            if (mirroredList.Any())
+            {
+                mirroredList.Reverse();
+                function.AddPieces(mirroredList);
+            }
+
+            function.AddPiece(Piece<double>.DefaultPiece);
+
+            //function.Preprocess = x => x.Clamp(-1, 1);
             return function;
         }
 
@@ -266,13 +311,9 @@ namespace WaveShaper
                 });
             }
 
-            function.AddPiece(new Piece<double>
-            {
-                Condition = x => true,
-                Function = x => 0
-            });
+            function.AddPiece(Piece<double>.DefaultPiece);
 
-            function.Preprocess = x => x.Clamp(-1, 1);
+            //function.Preprocess = x => x.Clamp(-1, 1);
             return function;
         }
 

@@ -68,26 +68,31 @@ namespace WaveShaper.Bezier
 
         public IEnumerable<BezierCurve> GetCurves() => bezierFigures.Select(ConvertFigureToCurve).ToList();
 
-        private BezierCurve ConvertFigureToCurve(BezierFigure figure) => new BezierCurve
+        private BezierCurve ConvertFigureToCurve(BezierFigure figure)
         {
-            Id = figure.Id,
-            P0 = ConvertPointFromCanvas(figure.StartPoint),
-            P1 = ConvertPointFromCanvas(figure.StartBezierPoint),
-            P2 = ConvertPointFromCanvas(figure.EndBezierPoint),
-            P3 = ConvertPointFromCanvas(figure.EndPoint),
-            Next = figure.NextFigure?.Id,
-            Prev = figure.PreviousFigure?.Id
-        };
+            return new BezierCurve
+            {
+                Id = figure.Id,
+                P0 = ConvertPointFromCanvas(figure.StartPoint),
+                P1 = ConvertPointFromCanvas(figure.StartBezierPoint),
+                P2 = ConvertPointFromCanvas(figure.EndBezierPoint),
+                P3 = ConvertPointFromCanvas(figure.EndPoint),
+                Next = figure.NextFigure?.Id,
+                Prev = figure.PreviousFigure?.Id
+            };
+        }
 
-        private BezierFigure ConvertCurveToFigure(BezierCurve curve) => new BezierFigure
+        private BezierFigure ConvertCurveToFigure(BezierCurve curve)
         {
-            Id = curve.Id,
-            StartPoint = ConvertPointToCanvas(curve.P0),
-            StartBezierPoint = ConvertPointToCanvas(curve.P1),
-            EndBezierPoint = ConvertPointToCanvas(curve.P2),
-            EndPoint = ConvertPointToCanvas(curve.P3)
-        };
-
+            return new BezierFigure
+            {
+                Id = curve.Id,
+                StartPoint = ConvertPointToCanvas(curve.P0),
+                StartBezierPoint = ConvertPointToCanvas(curve.P1),
+                EndBezierPoint = ConvertPointToCanvas(curve.P2),
+                EndPoint = ConvertPointToCanvas(curve.P3)
+            };
+        }
 
         internal Point ConvertPointFromCanvas(Point canvasPoint)
         {
@@ -121,7 +126,7 @@ namespace WaveShaper.Bezier
                     P0 = new Point(0, 0),
                     P1 = new Point(0.1, 0.1),
                     P2 = new Point(0.9, 0.9),
-                    P3 = new Point(1.01, 1.01)
+                    P3 = new Point(1.00001, 1.00001)
                 };
 
                 AddFigure(ConvertCurveToFigure(bc));
@@ -161,6 +166,30 @@ namespace WaveShaper.Bezier
             min -= 2*Offset;
             AreaSize = new Size(min, min);
 
+            double areaLeft = (canvaSize.Width + AreaSize.Width)/2d;
+            double areaTop = (canvaSize.Height/2) - (AreaSize.Height/2);
+            AreaTopLeft = new Point(areaLeft, areaTop);
+
+            Canvas.Children.Add(new Line
+            {
+                X1 = AreaTopLeft.X,
+                Y1 = AreaTopLeft.Y + (AreaSize.Height / 2),
+                X2 = AreaTopLeft.X + AreaSize.Width,
+                Y2 = AreaTopLeft.Y + (AreaSize.Height / 2),
+                StrokeThickness = 1,
+                Stroke = Brushes.LightGray
+            });
+
+            Canvas.Children.Add(new Line
+            {
+                X1 = AreaTopLeft.X + (AreaSize.Width / 2),
+                Y1 = AreaTopLeft.Y,
+                X2 = AreaTopLeft.X + (AreaSize.Width / 2),
+                Y2 = AreaTopLeft.Y + AreaSize.Height,
+                StrokeThickness = 1,
+                Stroke = Brushes.LightGray,
+            });
+
             var rect = new Rectangle
             {
                 Width = AreaSize.Width,
@@ -169,13 +198,10 @@ namespace WaveShaper.Bezier
                 StrokeThickness = 1
             };
 
-            double areaLeft = (canvaSize.Width + AreaSize.Width)/2d;
-            double areaTop = (canvaSize.Height/2) - (AreaSize.Height/2);
-            AreaTopLeft = new Point(areaLeft, areaTop);
-
             Canvas.Children.Add(rect);
             Canvas.SetLeft(rect, AreaTopLeft.X);
             Canvas.SetTop(rect, AreaTopLeft.Y);
+
 
             var m = new Matrix();
             m.Translate(-AreaTopLeft.X + Offset, -AreaTopLeft.Y + Offset);

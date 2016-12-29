@@ -31,13 +31,14 @@ namespace WaveShaper
             Mode = mode;
         }
 
-        public ProcessingType Mode { get; private set; }
+        private ProcessingType Mode { get; }
 
         public double? From
         {
             get { return from; }
             set
             {
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (value == from) return;
                 from = value;
                 OnPropertyChanged();
@@ -61,6 +62,7 @@ namespace WaveShaper
             get { return to; }
             set
             {
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (value == to) return;
                 to = value;
                 OnPropertyChanged();
@@ -99,30 +101,58 @@ namespace WaveShaper
 
         public string ExpressionDisplay => Mode == ProcessingType.PiecewiseFunction ? Expression : PolynomialExpressionToDisplayString(Expression);
 
-        public Predicate<double> GetCondition()
+        public Predicate<double> GetCondition(bool inverted = false)
         {
-            return (x) =>
+            if (inverted)
             {
-                bool r = true;
-
-                if (From != null)
+                return (x) =>
                 {
-                    if (FromOperator == Operator.LessOrEqualThan)
-                        r &= From.Value <= x;
-                    else if (FromOperator == Operator.LessThan)
-                        r &= From.Value < x;
-                }
+                    bool r = true;
 
-                if (To != null)
+                    if (To != null)
+                    {
+                        if (ToOperator == Operator.LessOrEqualThan)
+                            r &= -To.Value < x;
+                        else if (ToOperator == Operator.LessThan)
+                            r &= -To.Value <= x;
+                    }
+
+                    if (From != null)
+                    {
+                        if (FromOperator == Operator.LessOrEqualThan)
+                            r &= -From.Value > x;
+                        else if (FromOperator == Operator.LessThan)
+                            r &= -From.Value >= x;
+                    }
+
+                    return r;
+                };
+            }
+            else
+            {
+                return (x) =>
                 {
-                    if (ToOperator == Operator.LessOrEqualThan)
-                        r &= x <= To.Value;
-                    else if (ToOperator == Operator.LessThan)
-                        r &= x < To.Value;
-                }
+                    bool r = true;
 
-                return r;
-            };
+                    if (From != null)
+                    {
+                        if (FromOperator == Operator.LessOrEqualThan)
+                            r &= From.Value <= x;
+                        else if (FromOperator == Operator.LessThan)
+                            r &= From.Value < x;
+                    }
+
+                    if (To != null)
+                    {
+                        if (ToOperator == Operator.LessOrEqualThan)
+                            r &= x <= To.Value;
+                        else if (ToOperator == Operator.LessThan)
+                            r &= x < To.Value;
+                    }
+
+                    return r;
+                };
+            }
         }
 
         public Func<double, double> GetPolynomialFunction()
