@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using WaveShaper.Utilities;
@@ -35,6 +37,9 @@ namespace WaveShaper.Bezier
 
         #endregion
 
+        private Point mouseMoveStartPoint;
+        private List<BezierCurve> mouseMoveStartingState;
+
         private BezierControl BezierControl => bezierControl ?? (bezierControl = WpfUtil.FindParent<BezierControl>(this));
 
         static ThumbPoint()
@@ -46,6 +51,11 @@ namespace WaveShaper.Bezier
         {
             this.DragDelta += this.OnDragDelta;
             this.Loaded += OnLoaded;
+
+            // Thumb swallows mouse events, need to register with true, so we also receive handled events
+            this.AddHandler(MouseDownEvent, new MouseButtonEventHandler(OnMouseDown), true);
+            this.AddHandler(MouseUpEvent, new MouseButtonEventHandler(OnMouseUp), true);
+
             Cursor = Cursors.Hand;
         }
 
@@ -54,10 +64,24 @@ namespace WaveShaper.Bezier
             UpdateTooltip();
         }
 
+        private void OnMouseDown(object sender, MouseButtonEventArgs mouseButtonEventArgs)
+        {
+            var p = Point;
+            mouseMoveStartPoint = new Point(p.X, p.Y);
+            mouseMoveStartingState = BezierControl.GetCurves().ToList();
+        }
+
         private void OnDragDelta(object sender, DragDeltaEventArgs e)
         {
             this.Point = new Point(this.Point.X + e.HorizontalChange, this.Point.Y + e.VerticalChange);
             UpdateTooltip();
+        }
+
+        private void OnMouseUp(object sender, MouseButtonEventArgs mouseButtonEventArgs)
+        {
+            var p = Point;
+            if (p != mouseMoveStartPoint)
+                BezierControl.SaveStateToStack(mouseMoveStartingState);
         }
 
         private void UpdateTooltip()

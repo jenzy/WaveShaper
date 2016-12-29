@@ -104,12 +104,15 @@
   <Grid>
     <Grid>
       <Border BorderBrush="Black" BorderThickness="0">
-        <Canvas ClipToBounds="True" x:Name="Canvas" />
+        <Canvas ClipToBounds="True" x:Name="Canvas" MouseMove="Canvas_OnMouseMove" ToolTip="Test" />
       </Border>
     </Grid>
-    <StackPanel DockPanel.Dock="Right" Orientation="Vertical" HorizontalAlignment="Right" Margin="10" >
-      <Button x:Name="ButtonUndo" Content="↶" MinWidth="20" MinHeight="20" VerticalAlignment="Center" ToolTip="Undo"/>
-    </StackPanel>
+    <DockPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Margin="10" >
+      <Button x:Name="ButtonUndo" DockPanel.Dock="Top"  Content="↶" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Right" ToolTip="Undo" Margin="2"/>
+      <Button x:Name="ButtonRedo" DockPanel.Dock="Top"  Content="↷" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Right" ToolTip="Redo" Margin="2"/>
+      <TextBlock DockPanel.Dock="Bottom" VerticalAlignment="Bottom" HorizontalAlignment="Right" 
+                 Text="{Binding CurrentMousePosition}" MaxWidth="50"/>
+    </DockPanel>
   </Grid>
 
 </UserControl>

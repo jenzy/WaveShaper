@@ -29,6 +29,7 @@
     </Window.CommandBindings>
   <Window.InputBindings>
     <KeyBinding Command="{Binding ElementName=Bezier, Path=UndoCommand}" Key="Z" Modifiers="Control"></KeyBinding>
+    <KeyBinding Command="{Binding ElementName=Bezier, Path=RedoCommand}" Key="Y" Modifiers="Control"></KeyBinding>
   </Window.InputBindings>
 
     <Grid>
