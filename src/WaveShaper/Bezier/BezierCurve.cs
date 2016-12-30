@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using MathNet.Numerics.RootFinding;
 using WaveShaper.Utilities;
@@ -111,6 +112,20 @@ namespace WaveShaper.Bezier
 
             double y = tt * tt * tt * bc.P0.Y + 3 * tt * tt * t * bc.P1.Y + 3 * tt * t * t * bc.P2.Y + t * t * t * bc.P3.Y;
             return y;
+        }
+
+        public static IList<BezierCurve> GetIdentity()
+        {
+            return new List<BezierCurve>
+            {
+                new BezierCurve
+                {
+                    P0 = new Point(0, 0),
+                    P1 = new Point(0.1, 0.1),
+                    P2 = new Point(0.9, 0.9),
+                    P3 = new Point(1.00001, 1.00001)
+                }
+            };
         }
     }
 }

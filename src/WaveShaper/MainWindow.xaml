@@ -25,7 +25,9 @@
     </ObjectDataProvider>
   </Window.Resources>
   <Window.CommandBindings>
-    <CommandBinding Command="local:CustomCommands.Preset" Executed="CommandBinding_OnExecuted" />
+    <CommandBinding Command="{x:Static local:CustomCommands+Presets.Identity}" Executed="PresetIdentity_OnExecuted" />
+    <CommandBinding Command="{x:Static local:CustomCommands+Presets.SoftClip1}" Executed="PresetSoftClip1_OnExecuted" />
+    <CommandBinding Command="{x:Static local:CustomCommands+Presets.SoftClip2}" Executed="PresetSoftClip2_OnExecuted" />
   </Window.CommandBindings>
   <Window.InputBindings>
     <KeyBinding Command="{Binding ElementName=Bezier, Path=UndoCommand}" Key="Z" Modifiers="Control"></KeyBinding>
@@ -49,13 +51,6 @@
             <i:Interaction.Behaviors>
               <utils:DropDownButtonBehavior/>
             </i:Interaction.Behaviors>
-            <Button.ContextMenu>
-              <ContextMenu>
-                <MenuItem Header="Identity" Command="local:CustomCommands.Preset" CommandParameter="Identity" />
-                <MenuItem Header="Soft clipping 1" Command="local:CustomCommands.Preset" CommandParameter="SoftClipping1" />
-                <MenuItem Header="Soft clipping 2" Command="local:CustomCommands.Preset" CommandParameter="SoftClipping2" />
-              </ContextMenu>
-            </Button.ContextMenu>
           </Button>
         </DockPanel>
         <oxy:PlotView Model="{Binding ShapingFunctionPlot}" 

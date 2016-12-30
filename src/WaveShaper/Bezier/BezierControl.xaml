@@ -119,6 +119,7 @@
     <DockPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Margin="10" >
       <Button x:Name="ButtonUndo" DockPanel.Dock="Top"  Content="↶" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Right" ToolTip="Undo" Margin="2"/>
       <Button x:Name="ButtonRedo" DockPanel.Dock="Top"  Content="↷" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Right" ToolTip="Redo" Margin="2"/>
+      <Button x:Name="ButtonInfo" DockPanel.Dock="Top"  Content="ⓘ" Width="20" Height="20" VerticalAlignment="Center" HorizontalAlignment="Right" ToolTip="Show current curves' data" Margin="2,10,2,2"/>
       <TextBlock DockPanel.Dock="Bottom" VerticalAlignment="Bottom" HorizontalAlignment="Right" 
                  Text="{Binding CurrentMousePosition}" MaxWidth="50"/>
     </DockPanel>

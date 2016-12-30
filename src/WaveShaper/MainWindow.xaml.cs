@@ -153,7 +153,20 @@ namespace WaveShaper
                     throw new ArgumentOutOfRangeException();
             }
 
-            BtnPresets.IsEnabled = newType != ProcessingType.NoProcessing;
+            SetupPresets(newType);
+        }
+
+        private void SetupPresets(ProcessingType type)
+        {
+            BtnPresets.IsEnabled = type != ProcessingType.NoProcessing;
+            var menu = BtnPresets.ContextMenu ?? (BtnPresets.ContextMenu = new ContextMenu());
+            menu.Items.Clear();
+
+            menu.Items.Add(CustomCommands.Presets.Identity.ToMenuItem(commandParameter: type));
+            menu.Items.Add(CustomCommands.Presets.SoftClip1.ToMenuItem(commandParameter: type));
+
+            if (type == ProcessingType.PiecewiseFunction || type == ProcessingType.Bezier)
+                menu.Items.Add(CustomCommands.Presets.SoftClip2.ToMenuItem(commandParameter: type));
         }
 
         private void BtnApply_OnClick(object sender, RoutedEventArgs e)
@@ -329,89 +342,115 @@ namespace WaveShaper
 
         #endregion
 
-        private void CommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
-            var param = (string) e.Parameter;
-            var type = (ProcessingType) DdlProcessingType.SelectedValue;
-            if (type == ProcessingType.NoProcessing)
-                return;
-
-            switch (param)
-            {
-                case "Identity":
-                    Rows.Clear();
-                    if (type == ProcessingType.PiecewiseFunction)
-                    {
-                        Rows.Add(new PiecewiseFunctionRow
-                        {
-                            Expression = "x"
-                        });
-                    }
-                    else if (type == ProcessingType.PiecewisePolynomial)
-                    {
-                        Rows.Add(new PiecewiseFunctionRow(mode: ProcessingType.PiecewisePolynomial)
-                        {
-                            Expression = "0,1"
-                        });
-                    }
-                    break;
-
-                case "SoftClipping1":
-                    Rows.Clear();
-                    if (type == ProcessingType.PiecewiseFunction)
-                    {
-                        Rows.Add(new PiecewiseFunctionRow { ToOperator = Operator.LessOrEqualThan, To = -1, Expression = "-2/3" });
-                        Rows.Add(new PiecewiseFunctionRow
-                        {
-                            From = -1,
-                            FromOperator = Operator.LessThan,
-                            ToOperator = Operator.LessThan,
-                            To = 1,
-                            Expression = "x - (x^3)/3"
-                        });
-                        Rows.Add(new PiecewiseFunctionRow { FromOperator = Operator.LessOrEqualThan, From = 1, Expression = "2/3" });
-                    }
-                    else if (type == ProcessingType.PiecewisePolynomial)
-                    {
-                        Rows.Add(new PiecewiseFunctionRow(mode: ProcessingType.PiecewisePolynomial) { ToOperator = Operator.LessOrEqualThan, To = -1, Expression = "-0.666" });
-                        Rows.Add(new PiecewiseFunctionRow(mode: ProcessingType.PiecewisePolynomial)
-                        {
-                            From = -1,
-                            FromOperator = Operator.LessThan,
-                            ToOperator = Operator.LessThan,
-                            To = 1,
-                            Expression = "0, 1, 0, -0.333"
-                        });
-                        Rows.Add(new PiecewiseFunctionRow(mode: ProcessingType.PiecewisePolynomial) { FromOperator = Operator.LessOrEqualThan, From = 1, Expression = "0.666" });
-                    }
-                    break;
-
-                case "SoftClipping2":
-                    if (type == ProcessingType.PiecewiseFunction)
-                    {
-                        Rows.Clear();
-                        Rows.Add(new PiecewiseFunctionRow { ToOperator = Operator.LessOrEqualThan, To = -0.5, Expression = "-1" });
-                        Rows.Add(new PiecewiseFunctionRow
-                        {
-                            From = -0.5,
-                            FromOperator = Operator.LessThan,
-                            ToOperator = Operator.LessThan,
-                            To = 0.5,
-                            Expression = "sin(pi * x / (2 * 0.5))"
-                        });
-                        Rows.Add(new PiecewiseFunctionRow { FromOperator = Operator.LessOrEqualThan, From = 0.5, Expression = "1" });
-                    }
-                    break;
-            }
-
-        }
-
         private void BtnPreviewEffect_OnClick(object sender, RoutedEventArgs e)
         {
             var func = BuildFunction();
 
             var window = new EffectPreview(func);
             window.Show();
+        }
+
+        private void PresetIdentity_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            var type = (ProcessingType) e.Parameter;
+            if (type == ProcessingType.PiecewiseFunction)
+            {
+                Rows.Clear();
+                Rows.Add(new PiecewiseFunctionRow { Expression = "x" });
+            }
+            else if (type == ProcessingType.PiecewisePolynomial)
+            {
+                Rows.Clear();
+                Rows.Add(new PiecewiseFunctionRow(mode: ProcessingType.PiecewisePolynomial) { Expression = "0,1" });
+            }
+            else if (type == ProcessingType.Bezier)
+            {
+                Bezier.ClearAndSetCurves(BezierCurve.GetIdentity());
+            }
+        }
+
+        private void PresetSoftClip1_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            var type = (ProcessingType)e.Parameter;
+            if (type == ProcessingType.PiecewiseFunction)
+            {
+                Rows.Clear();
+                Rows.Add(new PiecewiseFunctionRow { ToOperator = Operator.LessOrEqualThan, To = -1, Expression = "-2/3" });
+                Rows.Add(new PiecewiseFunctionRow
+                {
+                    From = -1,
+                    FromOperator = Operator.LessThan,
+                    ToOperator = Operator.LessThan,
+                    To = 1,
+                    Expression = "x - (x^3)/3"
+                });
+                Rows.Add(new PiecewiseFunctionRow { FromOperator = Operator.LessOrEqualThan, From = 1, Expression = "2/3" });
+            }
+            else if (type == ProcessingType.PiecewisePolynomial)
+            {
+                Rows.Clear();
+                Rows.Add(new PiecewiseFunctionRow(mode: ProcessingType.PiecewisePolynomial) { ToOperator = Operator.LessOrEqualThan, To = -1, Expression = "-0.666" });
+                Rows.Add(new PiecewiseFunctionRow(mode: ProcessingType.PiecewisePolynomial)
+                {
+                    From = -1,
+                    FromOperator = Operator.LessThan,
+                    ToOperator = Operator.LessThan,
+                    To = 1,
+                    Expression = "0, 1, 0, -0.333"
+                });
+                Rows.Add(new PiecewiseFunctionRow(mode: ProcessingType.PiecewisePolynomial) { FromOperator = Operator.LessOrEqualThan, From = 1, Expression = "0.666" });
+            }
+            else if (type == ProcessingType.Bezier)
+            {
+                Bezier.ClearAndSetCurves(new List<BezierCurve>
+                {
+                    new BezierCurve
+                    {
+                        P0 = new Point(0, 0),
+                        P1 = new Point(0.5, 0.5),
+                        P2 = new Point(0.75, 2/3d),
+                        P3 = new Point(1.00001, 2/3d)
+                    }
+                });
+            }
+        }
+
+        private void PresetSoftClip2_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            var type = (ProcessingType)e.Parameter;
+            if (type == ProcessingType.PiecewiseFunction)
+            {
+                Rows.Clear();
+                Rows.Add(new PiecewiseFunctionRow {ToOperator = Operator.LessOrEqualThan, To = -0.5, Expression = "-1"});
+                Rows.Add(new PiecewiseFunctionRow
+                {
+                    From = -0.5,
+                    FromOperator = Operator.LessThan,
+                    ToOperator = Operator.LessThan,
+                    To = 0.5,
+                    Expression = "sin(pi * x / (2 * 0.5))"
+                });
+                Rows.Add(new PiecewiseFunctionRow {FromOperator = Operator.LessOrEqualThan, From = 0.5, Expression = "1"});
+            }
+            else if (type == ProcessingType.Bezier)
+            {
+                var c1 = new BezierCurve
+                {
+                    P0 = new Point(0, 0),
+                    P1 = new Point(0.23, 0.57),
+                    P2 = new Point(0.38, 1d),
+                    P3 = new Point(0.5, 1d)
+                };
+                var c2 = new BezierCurve
+                {
+                    P0 = new Point(0.5, 1d),
+                    P1 = new Point(0.6, 1d),
+                    P2 = new Point(0.9, 1d),
+                    P3 = new Point(1.00001, 1d),
+                    Next = c1.Id
+                };
+                Bezier.ClearAndSetCurves(new List<BezierCurve> {c1, c2});
+            }
         }
     }
 }

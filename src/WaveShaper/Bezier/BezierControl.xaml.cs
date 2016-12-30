@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Newtonsoft.Json;
 using WaveShaper.Annotations;
 using WaveShaper.Utilities;
 
@@ -47,6 +48,8 @@ namespace WaveShaper.Bezier
 
             ButtonUndo.Command = UndoCommand;
             ButtonRedo.Command = RedoCommand;
+
+            ButtonInfo.Command = new ActionCommand(p => DumpCurvesInfo(), p => true);
         }
 
         private Size AreaSize { get; set; }
@@ -120,17 +123,7 @@ namespace WaveShaper.Bezier
             AddCanvasText("1", new Point(-0.03, 1.02));
 
             if (!bezierFigures.Any())
-            {
-                var bc = new BezierCurve
-                {
-                    P0 = new Point(0, 0),
-                    P1 = new Point(0.1, 0.1),
-                    P2 = new Point(0.9, 0.9),
-                    P3 = new Point(1.00001, 1.00001)
-                };
-
-                AddFigure(ConvertCurveToFigure(bc));
-            }
+                ClearAndSetCurves(BezierCurve.GetIdentity(), saveCurrentState: false);
         }
 
         private void AddCanvasText(string text, Point normalisedPoint)
@@ -249,10 +242,17 @@ namespace WaveShaper.Bezier
             if (stack.Count == 0)
                 return;
 
-            List<BezierCurve> curves = stack.Pop();
+            ClearAndSetCurves(stack.Pop(), saveCurrentState: false);
+        }
+
+        public void ClearAndSetCurves(ICollection<BezierCurve> curves, bool saveCurrentState = true)
+        {
+            if (saveCurrentState)
+                SaveStateToStack();
+
             Dictionary<Guid, BezierFigure> newFigures = curves.Select(ConvertCurveToFigure).ToDictionary(f => f.Id, f => f);
 
-            foreach (BezierFigure bf in bezierFigures.ToArray())
+            foreach (var bf in bezierFigures.ToArray())
                 RemoveFigure(bf);
 
             foreach (BezierCurve c in curves.Where(c => c.Next != null))
@@ -304,6 +304,15 @@ namespace WaveShaper.Bezier
         {
             Canvas.ReleaseMouseCapture();
             dragIsDragged = false;
+        }
+
+        private void DumpCurvesInfo()
+        {
+            var curves = GetCurves().ToList();
+            string json = JsonConvert.SerializeObject(curves, Formatting.Indented);
+            var r = MessageBox.Show(json, "Current curves (OK to copy)", MessageBoxButton.OKCancel, MessageBoxImage.Information);
+            if (r == MessageBoxResult.OK)
+                Clipboard.SetText(json);
         }
     }
 }
