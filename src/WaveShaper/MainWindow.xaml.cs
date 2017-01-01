@@ -452,5 +452,12 @@ namespace WaveShaper
                 Bezier.ClearAndSetCurves(new List<BezierCurve> {c1, c2});
             }
         }
+
+        private void CbOversampling_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var item = (ComboBoxItem) CbOversampling.SelectedItem;
+            int oversampling = int.Parse((string) item.Tag);
+            Player.Oversampling = oversampling;
+        }
     }
 }

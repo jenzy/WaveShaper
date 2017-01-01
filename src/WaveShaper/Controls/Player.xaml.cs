@@ -22,6 +22,7 @@ namespace WaveShaper.Controls
         private WaveOut waveOut;
         //private ShapingSampleProvider samplesProvider;
         private Func<double, double> shapingFunction;
+        private int oversampling = 1;
 
         public Player()
         {
@@ -34,7 +35,7 @@ namespace WaveShaper.Controls
             timer.Start();
         }
 
-        public ShapingChain Chain { get; private set; }
+        private ShapingChain Chain { get; set; }
 
         public Func<double, double> ShapingFunction
         {
@@ -44,6 +45,20 @@ namespace WaveShaper.Controls
                 shapingFunction = value;
                 if (Chain != null)
                     Chain.Shaper.ShapingFunction = value;
+            }
+        }
+
+        public int Oversampling
+        {
+            set
+            {
+                oversampling = value;
+                if (Chain != null)
+                {
+                    Chain.OverSampling = value;
+                    BtnStop_OnClick(BtnStop, new RoutedEventArgs());
+                    waveOut.Init(Chain.Output);
+                }
             }
         }
 
@@ -89,8 +104,7 @@ namespace WaveShaper.Controls
                 LblFileTitle.Content = openFileDialog.FileName;
                 SetLabelTime(TimeSpan.Zero, inputSamples.TimeSpanLength);
 
-                Chain = new ShapingChain(samples, afr.WaveFormat, shapingFunction);
-                Chain.OverSampling = 4;
+                Chain = new ShapingChain(samples, afr.WaveFormat, shapingFunction) {OverSampling = oversampling};
 
                 waveOut = new WaveOut();
                 waveOut.PlaybackStopped += WaveOutOnPlaybackStopped;
