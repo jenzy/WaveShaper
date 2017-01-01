@@ -99,7 +99,11 @@
     <Compile Include="PiecewiseFunction.cs" />
     <Compile Include="ProcessingType.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Shaping\ArraySampleProvider.cs" />
+    <Compile Include="Shaping\LowPassFilterProvider.cs" />
+    <Compile Include="Shaping\ShapingChain.cs" />
     <Compile Include="ShapingSampleProvider.cs" />
+    <Compile Include="Shaping\ShapingProvider.cs" />
     <Compile Include="Utilities\DropDownButtonBehaviour.cs" />
     <Compile Include="Utilities\EnumUtil.cs" />
     <Compile Include="Utilities\Extensions.cs" />

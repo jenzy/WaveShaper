@@ -7,6 +7,7 @@ using System.Windows.Threading;
 using Microsoft.Win32;
 using NAudio.Utils;
 using NAudio.Wave;
+using WaveShaper.Shaping;
 using WaveShaper.Utilities;
 
 namespace WaveShaper.Controls
@@ -19,7 +20,7 @@ namespace WaveShaper.Controls
         private WaveSample inputSamples;
         private string currentFilename;
         private WaveOut waveOut;
-        private ShapingSampleProvider samplesProvider;
+        //private ShapingSampleProvider samplesProvider;
         private Func<double, double> shapingFunction;
 
         public Player()
@@ -33,14 +34,16 @@ namespace WaveShaper.Controls
             timer.Start();
         }
 
+        public ShapingChain Chain { get; private set; }
+
         public Func<double, double> ShapingFunction
         {
-            get { return samplesProvider?.ShapingFunction ?? shapingFunction ?? ShapingSampleProvider.DefaultShapingFunction; }
+            get { return Chain?.Shaper.ShapingFunction ?? shapingFunction ?? ShapingProvider.DefaultShapingFunction; }
             set
             {
                 shapingFunction = value;
-                if (samplesProvider != null)
-                    samplesProvider.ShapingFunction = value;
+                if (Chain != null)
+                    Chain.Shaper.ShapingFunction = value;
             }
         }
 
@@ -58,6 +61,7 @@ namespace WaveShaper.Controls
             {
                 waveOut.Stop();
                 waveOut = null;
+                Chain = null;
             }
 
             var openFileDialog = new OpenFileDialog { Filter = "Audio Files|*.mp3;*.wav;*.wmp|All files (*.*)|*.*" };
@@ -85,10 +89,12 @@ namespace WaveShaper.Controls
                 LblFileTitle.Content = openFileDialog.FileName;
                 SetLabelTime(TimeSpan.Zero, inputSamples.TimeSpanLength);
 
-                samplesProvider = new ShapingSampleProvider(inputSamples, shapingFunction);
+                Chain = new ShapingChain(samples, afr.WaveFormat, shapingFunction);
+                Chain.OverSampling = 4;
+
                 waveOut = new WaveOut();
                 waveOut.PlaybackStopped += WaveOutOnPlaybackStopped;
-                waveOut.Init(samplesProvider);
+                waveOut.Init(Chain.Output);
             }
         }
 
@@ -102,7 +108,7 @@ namespace WaveShaper.Controls
             if (BtnPlay.IsChecked == null)
                 return;
 
-            if (inputSamples == null)
+            if (Chain == null)
             {
                 BtnOpenFile_OnClick(BtnOpenFile, e);
             }
@@ -117,7 +123,7 @@ namespace WaveShaper.Controls
 
         private void BtnSaveFile_OnClick(object sender, RoutedEventArgs e)
         {
-            if (samplesProvider == null)
+            if (Chain == null)
                 return;
 
             BtnStop_OnClick(BtnStop, e);
@@ -132,10 +138,9 @@ namespace WaveShaper.Controls
             if (saveFileDialog.ShowDialog() != true)
                 return;
 
-
             using (new WaitCursor())
             {
-                WaveFileWriter.CreateWaveFile(saveFileDialog.FileName, samplesProvider);
+                WaveFileWriter.CreateWaveFile(saveFileDialog.FileName, Chain.Output.ToWaveProvider());
             }
         }
 
@@ -145,7 +150,7 @@ namespace WaveShaper.Controls
                 return;
 
             waveOut.Stop();
-            samplesProvider.Position = 0;
+            Chain.Input.Position = 0;
             SetButtonPlay(true);
             BtnPlay.IsChecked = false;
         }
