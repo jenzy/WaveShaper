@@ -7,6 +7,7 @@ namespace WaveShaper.Shaping
     public class ShapingChain
     {
         private int overSampling = 1;
+        private float r = 1.0f;
 
         public ShapingChain(float[] inputSamples, WaveFormat inputWaveFormat, Func<double, double> shapingFunction = null)
         {
@@ -30,11 +31,24 @@ namespace WaveShaper.Shaping
                     return;
 
                 overSampling = value;
-                InitOverSampling(value);
+                InitOverSampling(value, R);
             }
         }
 
-        private void InitOverSampling(int oversampling)
+        public float R
+        {
+            get { return r; }
+            set
+            {
+                if (overSampling == value)
+                    return;
+
+                r = value;
+                InitOverSampling(OverSampling, value);
+            }
+        }
+
+        private void InitOverSampling(int oversampling, float r)
         {
             if (oversampling <= 0)
                 throw new ArgumentOutOfRangeException(nameof(oversampling), oversampling, @"Oversampling cannot be negative 0.");
@@ -52,7 +66,7 @@ namespace WaveShaper.Shaping
 
                 var upsampler = new WdlResamplingSampleProvider(Input, newSampleRate);
                 Shaper.Input = upsampler;
-                var lpf = new LowPassFilterProvider(Shaper, cutoffFrequency, 1);
+                var lpf = new LowPassFilterProvider(Shaper, cutoffFrequency, r);
                 var downsampler = new WdlResamplingSampleProvider(lpf, Input.WaveFormat.SampleRate);
                 Output = downsampler;
             }

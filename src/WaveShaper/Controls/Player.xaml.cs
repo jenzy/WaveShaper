@@ -23,6 +23,7 @@ namespace WaveShaper.Controls
         //private ShapingSampleProvider samplesProvider;
         private Func<double, double> shapingFunction;
         private int oversampling = 1;
+        private float r = 1f;
 
         public Player()
         {
@@ -56,6 +57,20 @@ namespace WaveShaper.Controls
                 if (Chain != null)
                 {
                     Chain.OverSampling = value;
+                    BtnStop_OnClick(BtnStop, new RoutedEventArgs());
+                    waveOut.Init(Chain.Output);
+                }
+            }
+        }
+
+        public float R
+        {
+            set
+            {
+                r = value;
+                if (Chain != null)
+                {
+                    Chain.R = value;
                     BtnStop_OnClick(BtnStop, new RoutedEventArgs());
                     waveOut.Init(Chain.Output);
                 }
@@ -114,7 +129,18 @@ namespace WaveShaper.Controls
 
         private void WaveOutOnPlaybackStopped(object sender, StoppedEventArgs stoppedEventArgs)
         {
+            if (stopRequested)
+            {
+                stopRequested = false;
+                return;
+            }
+
             BtnStop_OnClick(BtnStop, null);
+            if (BtnRepeat.IsChecked != null && BtnRepeat.IsChecked.Value)
+            {
+                BtnPlay.IsChecked = true;
+                BtnPlay_OnClick(BtnPlay, null);
+            }
         }
 
         private void BtnPlay_OnClick(object sender, RoutedEventArgs e)
@@ -158,15 +184,32 @@ namespace WaveShaper.Controls
             }
         }
 
+        bool stopRequested = false;
+
         private void BtnStop_OnClick(object sender, RoutedEventArgs e)
         {
             if (waveOut == null)
                 return;
 
+            stopRequested = true;
             waveOut.Stop();
             Chain.Input.Position = 0;
+            waveOut.Init(Chain.Output);
             SetButtonPlay(true);
             BtnPlay.IsChecked = false;
+            SetLabelTime(waveOut.GetPositionTimeSpan(), inputSamples.TimeSpanLength);
+        }
+
+        private void BtnRepeat_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (BtnRepeat.IsChecked != null && BtnRepeat.IsChecked.Value)
+            {
+                BtnRepeat.Foreground = Brushes.DarkGreen;
+            }
+            else
+            {
+                BtnRepeat.Foreground = Brushes.Black;
+            }
         }
 
         private void SetButtonPlay(bool play)
