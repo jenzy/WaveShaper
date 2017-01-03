@@ -25,6 +25,7 @@ namespace WaveShaper.Bezier
             new FrameworkPropertyMetadata(new Point()));
 
         private BezierControl bezierControl;
+        private BezierFigure bezierFigure;
 
         /// <summary>
         /// Gets or sets the Point property
@@ -41,6 +42,8 @@ namespace WaveShaper.Bezier
         private List<BezierCurve> mouseMoveStartingState;
 
         private BezierControl BezierControl => bezierControl ?? (bezierControl = WpfUtil.FindParent<BezierControl>(this));
+
+        private BezierFigure BezierFigure => bezierFigure ?? (bezierFigure = WpfUtil.FindParent<BezierFigure>(this));
 
         static ThumbPoint()
         {
@@ -59,6 +62,8 @@ namespace WaveShaper.Bezier
             Cursor = Cursors.Hand;
         }
 
+        internal ThumbPointType? Type { get; set; }
+
         private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
         {
             UpdateTooltip();
@@ -73,7 +78,14 @@ namespace WaveShaper.Bezier
 
         private void OnDragDelta(object sender, DragDeltaEventArgs e)
         {
-            this.Point = new Point(this.Point.X + e.HorizontalChange, this.Point.Y + e.VerticalChange);
+            double newX = this.Point.X + e.HorizontalChange;
+            if ((Type == ThumbPointType.P0 && BezierFigure?.PreviousFigure == null)
+                || (Type == ThumbPointType.P3 && BezierFigure?.NextFigure == null))
+            {
+                newX = this.Point.X;
+            }
+
+            this.Point = new Point(newX, this.Point.Y + e.VerticalChange);
             UpdateTooltip();
         }
 
@@ -93,5 +105,13 @@ namespace WaveShaper.Bezier
             ToolTip = $"X: {p.X:0.####}\nY: {p.Y:0.####}";
         }
 
+    }
+
+    internal enum ThumbPointType
+    {
+        P0,
+        P1,
+        P2,
+        P3,
     }
 }

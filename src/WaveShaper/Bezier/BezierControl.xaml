@@ -75,10 +75,10 @@
                 </Path.Data>
               </Path>
 
-              <local:ThumbPoint Point="{Binding Path=StartPoint, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
+              <local:ThumbPoint Point="{Binding Path=StartPoint, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Type="P0"/>
               <local:ThumbPoint Point="{Binding Path=StartBezierPoint, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
               <local:ThumbPoint Point="{Binding Path=EndBezierPoint, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
-              <local:ThumbPoint Point="{Binding Path=EndPoint, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
+              <local:ThumbPoint Point="{Binding Path=EndPoint, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Type="P3"/>
             </Canvas>
           </ControlTemplate>
         </Setter.Value>
