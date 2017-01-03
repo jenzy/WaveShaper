@@ -16,6 +16,7 @@ using WaveShaper.Annotations;
 using WaveShaper.Bezier;
 using WaveShaper.Utilities;
 using WaveShaper.Windows;
+using System.Windows.Media;
 
 namespace WaveShaper
 {
@@ -458,6 +459,20 @@ namespace WaveShaper
             var item = (ComboBoxItem) CbOversampling.SelectedItem;
             int oversampling = int.Parse((string) item.Tag);
             Player.Oversampling = oversampling;
+        }
+
+        private void TxtR_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            float r;
+            if (!float.TryParse(TxtR.Text, out r))
+            {
+                TxtR.Background = Brushes.LightPink;
+            }
+            else
+            {
+                TxtR.Background = Brushes.White;
+                Player.R = r;
+            }
         }
     }
 }

@@ -12,189 +12,191 @@
         mc:Ignorable="d"
         Title="WaveShaper" Height="600" Width="900" 
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
-  <Window.Resources>
-    <ObjectDataProvider x:Key="DpProcessingTypes" MethodName="AllValuesForDdl" ObjectType="utils:EnumUtil">
-      <ObjectDataProvider.MethodParameters>
-        <x:TypeExtension TypeName="local:ProcessingType" />
-      </ObjectDataProvider.MethodParameters>
-    </ObjectDataProvider>
-    <ObjectDataProvider x:Key="DpOperator" MethodName="AllValuesForDdl" ObjectType="utils:EnumUtil">
-      <ObjectDataProvider.MethodParameters>
-        <x:TypeExtension TypeName="local:Operator" />
-      </ObjectDataProvider.MethodParameters>
-    </ObjectDataProvider>
-  </Window.Resources>
-  <Window.CommandBindings>
-    <CommandBinding Command="{x:Static local:CustomCommands+Presets.Identity}" Executed="PresetIdentity_OnExecuted" />
-    <CommandBinding Command="{x:Static local:CustomCommands+Presets.SoftClip1}" Executed="PresetSoftClip1_OnExecuted" />
-    <CommandBinding Command="{x:Static local:CustomCommands+Presets.SoftClip2}" Executed="PresetSoftClip2_OnExecuted" />
-  </Window.CommandBindings>
-  <Window.InputBindings>
-    <KeyBinding Command="{Binding ElementName=Bezier, Path=UndoCommand}" Key="Z" Modifiers="Control"></KeyBinding>
-    <KeyBinding Command="{Binding ElementName=Bezier, Path=RedoCommand}" Key="Y" Modifiers="Control"></KeyBinding>
-  </Window.InputBindings>
+    <Window.Resources>
+        <ObjectDataProvider x:Key="DpProcessingTypes" MethodName="AllValuesForDdl" ObjectType="utils:EnumUtil">
+            <ObjectDataProvider.MethodParameters>
+                <x:TypeExtension TypeName="local:ProcessingType" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="DpOperator" MethodName="AllValuesForDdl" ObjectType="utils:EnumUtil">
+            <ObjectDataProvider.MethodParameters>
+                <x:TypeExtension TypeName="local:Operator" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:CustomCommands+Presets.Identity}" Executed="PresetIdentity_OnExecuted" />
+        <CommandBinding Command="{x:Static local:CustomCommands+Presets.SoftClip1}" Executed="PresetSoftClip1_OnExecuted" />
+        <CommandBinding Command="{x:Static local:CustomCommands+Presets.SoftClip2}" Executed="PresetSoftClip2_OnExecuted" />
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding ElementName=Bezier, Path=UndoCommand}" Key="Z" Modifiers="Control"></KeyBinding>
+        <KeyBinding Command="{Binding ElementName=Bezier, Path=RedoCommand}" Key="Y" Modifiers="Control"></KeyBinding>
+    </Window.InputBindings>
 
-  <Grid>
-    <controls:Player Margin="10,10,10,0" VerticalAlignment="Top" x:Name="Player" />
-    <GroupBox Header="Waveshaper" Margin="10,64,10,10">
-      <Grid>
-        <DockPanel Margin="325,10,10,0" HorizontalAlignment="Stretch"  VerticalAlignment="Top">
-          <Button x:Name="BtnApply" Content="_Apply" HorizontalAlignment="Left" Width="100" Margin="0,0,10,0" 
+    <Grid>
+        <controls:Player Margin="10,10,10,0" VerticalAlignment="Top" x:Name="Player" />
+        <GroupBox Header="Waveshaper" Margin="10,64,10,10">
+            <Grid>
+                <DockPanel Margin="325,10,10,0" HorizontalAlignment="Stretch"  VerticalAlignment="Top">
+                    <Button x:Name="BtnApply" Content="_Apply" HorizontalAlignment="Left" Width="100" Margin="0,0,10,0" 
                             Click="BtnApply_OnClick"/>
-          <ComboBox x:Name="DdlProcessingType" 
+                    <ComboBox x:Name="DdlProcessingType" 
                           ItemsSource="{Binding Source={StaticResource DpProcessingTypes}}"  DisplayMemberPath="Text" SelectedValuePath="Value"
                           SelectedIndex="0" IsSynchronizedWithCurrentItem="True"
                           SelectionChanged="DdlProcessingType_OnSelectionChanged" Width="150" />
-          <CheckBox x:Name="CbMirrored" VerticalAlignment="Center" Margin="20,0,20,0"
+                    <CheckBox x:Name="CbMirrored" VerticalAlignment="Center" Margin="20,0,20,0"
                           Content="_Mirrored mode" IsChecked="True" IsEnabled="False"/>
-          <Button x:Name="BtnPresets" Content="Presets ▾" HorizontalAlignment="Right" Width="60" Margin="10,0,0,0" IsEnabled="False" >
-            <i:Interaction.Behaviors>
-              <utils:DropDownButtonBehavior/>
-            </i:Interaction.Behaviors>
-          </Button>
-        </DockPanel>
-        <TabControl x:Name="TabControl" Margin="325,40,10,10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-          <TabControl.ItemContainerStyle>
-            <Style TargetType="{x:Type TabItem}">
-              <Setter Property="Visibility" Value="Collapsed" />
-            </Style>
-          </TabControl.ItemContainerStyle>
-          <TabItem Header="TabItem" x:Name="TabNone"/>
-          <TabItem Header="TabItem" x:Name="TabTable">
-            <Grid >
-              <DataGrid x:Name="DgPiecewiseFunction" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                    <Button x:Name="BtnPresets" Content="Presets ▾" HorizontalAlignment="Right" Width="60" Margin="10,0,0,0" IsEnabled="False" >
+                        <i:Interaction.Behaviors>
+                            <utils:DropDownButtonBehavior/>
+                        </i:Interaction.Behaviors>
+                    </Button>
+                </DockPanel>
+                <TabControl x:Name="TabControl" Margin="325,40,10,10" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <TabControl.ItemContainerStyle>
+                        <Style TargetType="{x:Type TabItem}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </Style>
+                    </TabControl.ItemContainerStyle>
+                    <TabItem Header="TabItem" x:Name="TabNone"/>
+                    <TabItem Header="TabItem" x:Name="TabTable">
+                        <Grid >
+                            <DataGrid x:Name="DgPiecewiseFunction" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                                       Margin="0,0,0,0" Height="Auto" Width="Auto" MinHeight="300"
                                       CanUserAddRows="True" CanUserDeleteRows="True" AutoGenerateColumns="False"
                                       ItemsSource="{Binding Rows, Mode=TwoWay}">
-                <DataGrid.CellStyle>
-                  <Style TargetType="{x:Type DataGridCell}">
-                    <Setter Property="Template">
-                      <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type DataGridCell}">
-                          <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                            <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
-                          </Border>
-                        </ControlTemplate>
-                      </Setter.Value>
-                    </Setter>
-                    <Setter Property="Padding" Value="3"></Setter>
-                  </Style>
-                </DataGrid.CellStyle>
-                <DataGrid.Columns>
-                  <DataGridTextColumn MinWidth="50" ClipboardContentBinding="{Binding From}" >
-                    <DataGridTextColumn.EditingElementStyle>
-                      <Style TargetType="TextBox" >
-                        <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
-                        <Setter Property="Text" Value="{Binding From, StringFormat='{}{0:0.0###}', TargetNullValue=''}"/>
-                        <Setter Property="TextAlignment" Value="Right" />
-                      </Style>
-                    </DataGridTextColumn.EditingElementStyle>
-                    <DataGridTextColumn.ElementStyle>
-                      <Style TargetType="TextBlock">
-                        <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
-                        <Setter Property="Text" Value="{Binding FromDisplay}"/>
-                        <Setter Property="TextAlignment" Value="Right" />
-                      </Style>
-                    </DataGridTextColumn.ElementStyle>
-                  </DataGridTextColumn>
-                  <DataGridComboBoxColumn ItemsSource="{Binding Source={StaticResource DpOperator}}"
+                                <DataGrid.CellStyle>
+                                    <Style TargetType="{x:Type DataGridCell}">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                                    <Border Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                        <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Setter Property="Padding" Value="3"></Setter>
+                                    </Style>
+                                </DataGrid.CellStyle>
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn MinWidth="50" ClipboardContentBinding="{Binding From}" >
+                                        <DataGridTextColumn.EditingElementStyle>
+                                            <Style TargetType="TextBox" >
+                                                <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
+                                                <Setter Property="Text" Value="{Binding From, StringFormat='{}{0:0.0###}', TargetNullValue=''}"/>
+                                                <Setter Property="TextAlignment" Value="Right" />
+                                            </Style>
+                                        </DataGridTextColumn.EditingElementStyle>
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
+                                                <Setter Property="Text" Value="{Binding FromDisplay}"/>
+                                                <Setter Property="TextAlignment" Value="Right" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridComboBoxColumn ItemsSource="{Binding Source={StaticResource DpOperator}}"
                                                             SelectedValueBinding="{Binding FromOperator}" DisplayMemberPath="Text" SelectedValuePath="Value"
                                                             MinWidth="50">
-                    <DataGridComboBoxColumn.EditingElementStyle>
-                      <Style>
-                        <Setter Property="ComboBox.MinWidth" Value="45" />
-                      </Style>
-                    </DataGridComboBoxColumn.EditingElementStyle>
-                    <DataGridComboBoxColumn.ElementStyle>
-                      <Style>
-                        <Setter Property="TextBlock.HorizontalAlignment" Value="Center" />
-                      </Style>
-                    </DataGridComboBoxColumn.ElementStyle>
-                  </DataGridComboBoxColumn>
-                  <DataGridTextColumn Binding="{Binding VariableDisplay}" IsReadOnly="True">
-                    <DataGridTextColumn.ElementStyle>
-                      <Style>
-                        <Setter Property="TextBlock.TextAlignment" Value="Center" />
-                      </Style>
-                    </DataGridTextColumn.ElementStyle>
-                  </DataGridTextColumn>
-                  <DataGridComboBoxColumn ItemsSource="{Binding Source={StaticResource DpOperator}}"
+                                        <DataGridComboBoxColumn.EditingElementStyle>
+                                            <Style>
+                                                <Setter Property="ComboBox.MinWidth" Value="45" />
+                                            </Style>
+                                        </DataGridComboBoxColumn.EditingElementStyle>
+                                        <DataGridComboBoxColumn.ElementStyle>
+                                            <Style>
+                                                <Setter Property="TextBlock.HorizontalAlignment" Value="Center" />
+                                            </Style>
+                                        </DataGridComboBoxColumn.ElementStyle>
+                                    </DataGridComboBoxColumn>
+                                    <DataGridTextColumn Binding="{Binding VariableDisplay}" IsReadOnly="True">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style>
+                                                <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridComboBoxColumn ItemsSource="{Binding Source={StaticResource DpOperator}}"
                                                             SelectedValueBinding="{Binding ToOperator}" DisplayMemberPath="Text" SelectedValuePath="Value"
                                                             MinWidth="50">
-                    <DataGridComboBoxColumn.EditingElementStyle>
-                      <Style>
-                        <Setter Property="ComboBox.MinWidth" Value="45" />
-                      </Style>
-                    </DataGridComboBoxColumn.EditingElementStyle>
-                    <DataGridComboBoxColumn.ElementStyle>
-                      <Style>
-                        <Setter Property="TextBlock.HorizontalAlignment" Value="Center" />
-                      </Style>
-                    </DataGridComboBoxColumn.ElementStyle>
-                  </DataGridComboBoxColumn>
-                  <DataGridTextColumn MinWidth="50" ClipboardContentBinding="{Binding To}" >
-                    <DataGridTextColumn.EditingElementStyle>
-                      <Style TargetType="TextBox" >
-                        <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
-                        <Setter Property="Text" Value="{Binding To, StringFormat='{}{0:0.0###}', TargetNullValue=''}"/>
-                        <Setter Property="TextAlignment" Value="Right" />
-                      </Style>
-                    </DataGridTextColumn.EditingElementStyle>
-                    <DataGridTextColumn.ElementStyle>
-                      <Style TargetType="TextBlock">
-                        <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
-                        <Setter Property="Text" Value="{Binding ToDisplay}"/>
-                        <Setter Property="TextAlignment" Value="Right" />
-                      </Style>
-                    </DataGridTextColumn.ElementStyle>
-                  </DataGridTextColumn>
-                  <DataGridTextColumn Header="f(x)" ClipboardContentBinding="{Binding Expression}" Width="200*">
-                    <DataGridTextColumn.EditingElementStyle>
-                      <Style TargetType="TextBox" >
-                        <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
-                        <Setter Property="Text" Value="{Binding Expression, TargetNullValue=''}"/>
-                      </Style>
-                    </DataGridTextColumn.EditingElementStyle>
-                    <DataGridTextColumn.ElementStyle>
-                      <Style TargetType="TextBlock">
-                        <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
-                        <Setter Property="Text" Value="{Binding ExpressionDisplay}"/>
-                      </Style>
-                    </DataGridTextColumn.ElementStyle>
-                  </DataGridTextColumn>
-                </DataGrid.Columns>
-              </DataGrid>
-            </Grid>
-          </TabItem>
-          <TabItem Header="Bezier" x:Name="TabBezier">
-            <Grid>
-              <bezier:BezierControl x:Name="Bezier"/>
-            </Grid>
-          </TabItem>
-        </TabControl>
-        <Grid HorizontalAlignment="Left" Height="473" VerticalAlignment="Top" Width="320">
-          <oxy:PlotView Model="{Binding ShapingFunctionPlot}" 
+                                        <DataGridComboBoxColumn.EditingElementStyle>
+                                            <Style>
+                                                <Setter Property="ComboBox.MinWidth" Value="45" />
+                                            </Style>
+                                        </DataGridComboBoxColumn.EditingElementStyle>
+                                        <DataGridComboBoxColumn.ElementStyle>
+                                            <Style>
+                                                <Setter Property="TextBlock.HorizontalAlignment" Value="Center" />
+                                            </Style>
+                                        </DataGridComboBoxColumn.ElementStyle>
+                                    </DataGridComboBoxColumn>
+                                    <DataGridTextColumn MinWidth="50" ClipboardContentBinding="{Binding To}" >
+                                        <DataGridTextColumn.EditingElementStyle>
+                                            <Style TargetType="TextBox" >
+                                                <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
+                                                <Setter Property="Text" Value="{Binding To, StringFormat='{}{0:0.0###}', TargetNullValue=''}"/>
+                                                <Setter Property="TextAlignment" Value="Right" />
+                                            </Style>
+                                        </DataGridTextColumn.EditingElementStyle>
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
+                                                <Setter Property="Text" Value="{Binding ToDisplay}"/>
+                                                <Setter Property="TextAlignment" Value="Right" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn Header="f(x)" ClipboardContentBinding="{Binding Expression}" Width="200*">
+                                        <DataGridTextColumn.EditingElementStyle>
+                                            <Style TargetType="TextBox" >
+                                                <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
+                                                <Setter Property="Text" Value="{Binding Expression, TargetNullValue=''}"/>
+                                            </Style>
+                                        </DataGridTextColumn.EditingElementStyle>
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
+                                                <Setter Property="Text" Value="{Binding ExpressionDisplay}"/>
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="Bezier" x:Name="TabBezier">
+                        <Grid>
+                            <bezier:BezierControl x:Name="Bezier"/>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+                <Grid HorizontalAlignment="Left" Height="473" VerticalAlignment="Top" Width="320">
+                    <oxy:PlotView Model="{Binding ShapingFunctionPlot}" 
                               HorizontalAlignment="Left" VerticalAlignment="Top" Width="300" Height="300"
                               Margin="10,12,0,0" BorderBrush="LightGray" BorderThickness="0" />
-          <Button x:Name="BtnPreviewEffect" Content="Preview effect" Margin="0,290,10,0"
+                    <Button x:Name="BtnPreviewEffect" Content="Preview effect" Margin="0,290,10,0"
                   HorizontalAlignment="Right" VerticalAlignment="Top" Padding="10,2"
                   Click="BtnPreviewEffect_OnClick" RenderTransformOrigin="-0.208,-1.591"/>
-          <Label Content="Oversampling:" RenderTransformOrigin="0.919,0.115" Margin="159,326,75,121" />
-          <ComboBox x:Name="CbOversampling" Margin="250,330,10,0"  Width="60"
+                    <Label Content="Oversampling:" RenderTransformOrigin="0.919,0.115" Margin="159,326,75,121" />
+                    <ComboBox x:Name="CbOversampling" Margin="250,330,10,0"  Width="60"
                     HorizontalAlignment="Right"  VerticalAlignment="Top"
                     SelectionChanged="CbOversampling_OnSelectionChanged">
-            <ComboBoxItem Content="Off" Tag="1" IsSelected="True" />
-            <ComboBoxItem Content="2x" Tag="2" />
-            <ComboBoxItem Content="4x" Tag="4" />
-            <ComboBoxItem Content="8x" Tag="8" />
-            <ComboBoxItem Content="16x" Tag="16" />
-          </ComboBox>
+                        <ComboBoxItem Content="Off" Tag="1" IsSelected="True" />
+                        <ComboBoxItem Content="2x" Tag="2" />
+                        <ComboBoxItem Content="4x" Tag="4" />
+                        <ComboBoxItem Content="8x" Tag="8" />
+                    </ComboBox>
+                    <TextBox x:Name="TxtR" HorizontalAlignment="Right" Height="23" Margin="250,357,10,0" TextWrapping="Wrap" Text="1.0" VerticalAlignment="Top" Width="60" HorizontalContentAlignment="Right" ToolTip="Low pass filter R"
+                             TextChanged="TxtR_TextChanged"/>
+                    <Label Content="LPF R:" RenderTransformOrigin="0.919,0.115" Margin="159,354,75,93" HorizontalContentAlignment="Right" />
 
 
-        </Grid>
-      </Grid>
-    </GroupBox>
-  </Grid>
+                </Grid>
+            </Grid>
+        </GroupBox>
+    </Grid>
 </Window>
 
 
