@@ -25,8 +25,9 @@ namespace WaveShaper.Shaping
         {
             int samplesRead = source.Read(buffer, offset, sampleCount);
 
+            int channels = source.WaveFormat.Channels;
             for (int i = 0; i < samplesRead; i++)
-                buffer[offset + i] = filters[(i % source.WaveFormat.Channels)].Transform(buffer[offset + i]);
+                buffer[offset + i] = filters[(i % channels)].Transform(buffer[offset + i]);
 
             return samplesRead;
         }

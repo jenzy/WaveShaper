@@ -1,6 +1,5 @@
 ﻿using System;
 using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
 
 namespace WaveShaper.Shaping
 {
@@ -60,15 +59,18 @@ namespace WaveShaper.Shaping
             }
             else
             {
+                int channels = Input.WaveFormat.Channels;
                 int originalSampleRate = Input.WaveFormat.SampleRate;
                 int newSampleRate = originalSampleRate*oversampling;
                 float cutoffFrequency = originalSampleRate/2f;
 
-                var upsampler = new WdlResamplingSampleProvider(Input, newSampleRate);
-                Shaper.Input = upsampler;
+                //var upsampler = new WdlResamplingSampleProvider(Input, newSampleRate);
+                var upsampler = new MediaFoundationResampler(Input, WaveFormat.CreateIeeeFloatWaveFormat(newSampleRate, channels));
+                Shaper.Input = upsampler.ToSampleProvider();
                 var lpf = new LowPassFilterProvider(Shaper, cutoffFrequency, r);
-                var downsampler = new WdlResamplingSampleProvider(lpf, Input.WaveFormat.SampleRate);
-                Output = downsampler;
+                //var downsampler = new WdlResamplingSampleProvider(lpf, originalSampleRate);
+                var downsampler = new MediaFoundationResampler(lpf, WaveFormat.CreateIeeeFloatWaveFormat(originalSampleRate, channels));
+                Output = downsampler.ToSampleProvider();
             }
         }
 

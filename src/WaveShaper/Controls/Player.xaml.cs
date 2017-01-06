@@ -19,7 +19,7 @@ namespace WaveShaper.Controls
     {
         private WaveSample inputSamples;
         private string currentFilename;
-        private WaveOut waveOut;
+        private IWavePlayer waveOut;
         //private ShapingSampleProvider samplesProvider;
         private Func<double, double> shapingFunction;
         private int oversampling = 1;
@@ -31,7 +31,7 @@ namespace WaveShaper.Controls
             SetButtonPlay(true);
             SetLabelTime(TimeSpan.Zero, TimeSpan.Zero);
 
-            var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
             timer.Tick += Timer_Tick;
             timer.Start();
         }
@@ -57,7 +57,7 @@ namespace WaveShaper.Controls
                 if (Chain != null)
                 {
                     Chain.OverSampling = value;
-                    BtnStop_OnClick(BtnStop, new RoutedEventArgs());
+                    BtnStop_OnClick(BtnStop, null);
                     waveOut.Init(Chain.Output);
                 }
             }
@@ -71,7 +71,7 @@ namespace WaveShaper.Controls
                 if (Chain != null)
                 {
                     Chain.R = value;
-                    BtnStop_OnClick(BtnStop, new RoutedEventArgs());
+                    BtnStop_OnClick(BtnStop, null);
                     waveOut.Init(Chain.Output);
                 }
             }
@@ -82,7 +82,7 @@ namespace WaveShaper.Controls
             if (waveOut == null)
                 return;
 
-            SetLabelTime(waveOut.GetPositionTimeSpan(), inputSamples.TimeSpanLength);
+            SetLabelTime((waveOut as IWavePosition)?.GetPositionTimeSpan(), inputSamples.TimeSpanLength);
         }
 
         private void BtnOpenFile_OnClick(object sender, RoutedEventArgs e)
@@ -119,9 +119,14 @@ namespace WaveShaper.Controls
                 LblFileTitle.Content = openFileDialog.FileName;
                 SetLabelTime(TimeSpan.Zero, inputSamples.TimeSpanLength);
 
-                Chain = new ShapingChain(samples, afr.WaveFormat, shapingFunction) {OverSampling = oversampling};
+                Chain = new ShapingChain(samples, afr.WaveFormat, shapingFunction) {OverSampling = oversampling, R = r};
 
-                waveOut = new WaveOut();
+                waveOut = new WaveOut
+                {
+                    
+                    NumberOfBuffers = 3,
+                    //DesiredLatency = 1000*30
+                };
                 waveOut.PlaybackStopped += WaveOutOnPlaybackStopped;
                 waveOut.Init(Chain.Output);
             }
@@ -135,7 +140,7 @@ namespace WaveShaper.Controls
                 return;
             }
 
-            BtnStop_OnClick(BtnStop, null);
+            BtnStop_OnClick(null, null);
             if (BtnRepeat.IsChecked != null && BtnRepeat.IsChecked.Value)
             {
                 BtnPlay.IsChecked = true;
@@ -191,13 +196,15 @@ namespace WaveShaper.Controls
             if (waveOut == null)
                 return;
 
-            stopRequested = true;
+            if (sender != null)
+                stopRequested = true;
+
             waveOut.Stop();
             Chain.Input.Position = 0;
             waveOut.Init(Chain.Output);
             SetButtonPlay(true);
             BtnPlay.IsChecked = false;
-            SetLabelTime(waveOut.GetPositionTimeSpan(), inputSamples.TimeSpanLength);
+            SetLabelTime((waveOut as IWavePosition)?.GetPositionTimeSpan(), inputSamples.TimeSpanLength);
         }
 
         private void BtnRepeat_OnClick(object sender, RoutedEventArgs e)
@@ -227,8 +234,11 @@ namespace WaveShaper.Controls
             }
         }
 
-        private void SetLabelTime(TimeSpan current, TimeSpan total)
+        private void SetLabelTime(TimeSpan? current, TimeSpan total)
         {
+            if (current == null)
+                return;
+
             LblTime.Content = $"{current:mm\\:ss} / {total:mm\\:ss}";
         }
        
