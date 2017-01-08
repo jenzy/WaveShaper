@@ -24,6 +24,7 @@ namespace WaveShaper.Controls
         private Func<double, double> shapingFunction;
         private int oversampling = 1;
         private float r = 1f;
+        private bool stopRequested;
 
         public Player()
         {
@@ -121,12 +122,7 @@ namespace WaveShaper.Controls
 
                 Chain = new ShapingChain(samples, afr.WaveFormat, shapingFunction) {OverSampling = oversampling, R = r};
 
-                waveOut = new WaveOut
-                {
-                    
-                    NumberOfBuffers = 3,
-                    //DesiredLatency = 1000*30
-                };
+                waveOut = new WaveOut { NumberOfBuffers = 3 };
                 waveOut.PlaybackStopped += WaveOutOnPlaybackStopped;
                 waveOut.Init(Chain.Output);
             }
@@ -189,7 +185,6 @@ namespace WaveShaper.Controls
             }
         }
 
-        bool stopRequested = false;
 
         private void BtnStop_OnClick(object sender, RoutedEventArgs e)
         {

@@ -39,6 +39,7 @@ namespace WaveShaper.Shaping
             get { return r; }
             set
             {
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (overSampling == value)
                     return;
 
@@ -47,7 +48,7 @@ namespace WaveShaper.Shaping
             }
         }
 
-        private void InitOverSampling(int oversampling, float r)
+        private void InitOverSampling(int oversampling, float rr)
         {
             if (oversampling <= 0)
                 throw new ArgumentOutOfRangeException(nameof(oversampling), oversampling, @"Oversampling cannot be negative 0.");
@@ -67,7 +68,7 @@ namespace WaveShaper.Shaping
                 //var upsampler = new WdlResamplingSampleProvider(Input, newSampleRate);
                 var upsampler = new MediaFoundationResampler(Input, WaveFormat.CreateIeeeFloatWaveFormat(newSampleRate, channels));
                 Shaper.Input = upsampler.ToSampleProvider();
-                var lpf = new LowPassFilterProvider(Shaper, cutoffFrequency, r);
+                var lpf = new LowPassFilterProvider(Shaper, cutoffFrequency, rr);
                 //var downsampler = new WdlResamplingSampleProvider(lpf, originalSampleRate);
                 var downsampler = new MediaFoundationResampler(lpf, WaveFormat.CreateIeeeFloatWaveFormat(originalSampleRate, channels));
                 Output = downsampler.ToSampleProvider();

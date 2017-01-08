@@ -28,6 +28,7 @@
         <CommandBinding Command="{x:Static local:CustomCommands+Presets.Identity}" Executed="PresetIdentity_OnExecuted" />
         <CommandBinding Command="{x:Static local:CustomCommands+Presets.SoftClip1}" Executed="PresetSoftClip1_OnExecuted" />
         <CommandBinding Command="{x:Static local:CustomCommands+Presets.SoftClip2}" Executed="PresetSoftClip2_OnExecuted" />
+        <CommandBinding Command="{x:Static local:CustomCommands+Presets.HardClip}" Executed="PresetHardClip_OnExecuted" />
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Command="{Binding ElementName=Bezier, Path=UndoCommand}" Key="Z" Modifiers="Control"></KeyBinding>
@@ -46,7 +47,7 @@
                           SelectedIndex="0" IsSynchronizedWithCurrentItem="True"
                           SelectionChanged="DdlProcessingType_OnSelectionChanged" Width="150" />
                     <CheckBox x:Name="CbMirrored" VerticalAlignment="Center" Margin="20,0,20,0"
-                          Content="_Mirrored mode" IsChecked="True" IsEnabled="False"/>
+                          Content="_Unipolar mode" IsChecked="True" IsEnabled="False"/>
                     <Button x:Name="BtnPresets" Content="Presets ▾" HorizontalAlignment="Right" Width="60" Margin="10,0,0,0" IsEnabled="False" >
                         <i:Interaction.Behaviors>
                             <utils:DropDownButtonBehavior/>
@@ -188,11 +189,6 @@
                         <ComboBoxItem Content="4x" Tag="4" />
                         <ComboBoxItem Content="8x" Tag="8" />
                     </ComboBox>
-                    <TextBox x:Name="TxtR" HorizontalAlignment="Right" Height="23" Margin="250,357,10,0" TextWrapping="Wrap" Text="1.0" VerticalAlignment="Top" Width="60" HorizontalContentAlignment="Right" ToolTip="Low pass filter R"
-                             TextChanged="TxtR_TextChanged"/>
-                    <Label Content="LPF R:" RenderTransformOrigin="0.919,0.115" Margin="159,354,75,93" HorizontalContentAlignment="Right" />
-
-
                 </Grid>
             </Grid>
         </GroupBox>

@@ -16,7 +16,6 @@ using WaveShaper.Annotations;
 using WaveShaper.Bezier;
 using WaveShaper.Utilities;
 using WaveShaper.Windows;
-using System.Windows.Media;
 
 namespace WaveShaper
 {
@@ -168,6 +167,17 @@ namespace WaveShaper
 
             if (type == ProcessingType.PiecewiseFunction || type == ProcessingType.Bezier)
                 menu.Items.Add(CustomCommands.Presets.SoftClip2.ToMenuItem(commandParameter: type));
+
+            menu.Items.Add(CustomCommands.Presets.HardClip.ToMenuItem(commandParameter: type));
+
+            if (type == ProcessingType.Bezier)
+            {
+                menu.Items.Add(new MenuItem
+                {
+                    Header = "Crossover distortion",
+                    Command = new ActionCommand(p => PresetCrossoverDistortion_OnExecuted(), p => true)
+                });
+            }
         }
 
         private void BtnApply_OnClick(object sender, RoutedEventArgs e)
@@ -454,6 +464,95 @@ namespace WaveShaper
             }
         }
 
+        private void PresetCrossoverDistortion_OnExecuted()
+        {
+            var c1 = new BezierCurve
+            {
+                P0 = new Point(0, 0),
+                P1 = new Point(0.00771647431488687, 0.339152299202495),
+                P2 = new Point(0.0183373761381656, 0.520136097439118),
+                P3 = new Point(0.104281683229052, 0.527784641633753)
+            };
+            var c2 = new BezierCurve
+            {
+                P0 = new Point(0.104281683229052, 0.527784641633753),
+                P1 = new Point(0.186037864902091, 0.52909220615369),
+                P2 = new Point(0.228472552509041, 0.465639968190406),
+                P3 = new Point(0.257637099742363, 0.134952766531714),
+                Prev = c1.Id
+            };
+            var c3 = new BezierCurve
+            {
+                P0 = new Point(0.257637099742363, 0.134952766531714),
+                P1 = new Point(0.427643506643505, 0.375676320528773),
+                P2 = new Point(0.538222622546174, 0.556048264767812),
+                P3 = new Point(0.641025641025641, 0.706262062907364),
+                Prev = c2.Id
+            };
+            var c4 = new BezierCurve
+            {
+                P0 = new Point(0.641025641025641, 0.706262062907364),
+                P1 = new Point(0.728887282335496, 0.854099583545941),
+                P2 = new Point(0.855589975114535, 0.820785215161322),
+                P3 = new Point(1.00001, 0.828251933505092),
+                Prev = c3.Id
+            };
+            Bezier.ClearAndSetCurves(new List<BezierCurve> {c1, c2, c3, c4});
+        }
+
+        private void PresetHardClip_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            var type = (ProcessingType)e.Parameter;
+            if (type == ProcessingType.PiecewiseFunction)
+            {
+                Rows.Clear();
+                Rows.Add(new PiecewiseFunctionRow { ToOperator = Operator.LessOrEqualThan, To = -0.666, Expression = "-1" });
+                Rows.Add(new PiecewiseFunctionRow
+                {
+                    From = -0.666,
+                    FromOperator = Operator.LessThan,
+                    ToOperator = Operator.LessThan,
+                    To = 0.666,
+                    Expression = "1.5*x"
+                });
+                Rows.Add(new PiecewiseFunctionRow { FromOperator = Operator.LessOrEqualThan, From = 0.666, Expression = "1" });
+            }
+            else if (type == ProcessingType.PiecewisePolynomial)
+            {
+                Rows.Clear();
+                Rows.Add(new PiecewiseFunctionRow(mode: ProcessingType.PiecewisePolynomial) { ToOperator = Operator.LessOrEqualThan, To = -0.666, Expression = "-1" });
+                Rows.Add(new PiecewiseFunctionRow(mode: ProcessingType.PiecewisePolynomial)
+                {
+                    From = -0.666,
+                    FromOperator = Operator.LessThan,
+                    ToOperator = Operator.LessThan,
+                    To = 0.666,
+                    Expression = "0, 1.5"
+                });
+                Rows.Add(new PiecewiseFunctionRow(mode: ProcessingType.PiecewisePolynomial) { FromOperator = Operator.LessOrEqualThan, From = 0.666, Expression = "1" });
+            }
+            else if (type == ProcessingType.Bezier)
+            {
+                var c1 = new BezierCurve
+                {
+                    P0 = new Point(0, 0),
+                    P1 = new Point(0.25, 0.375),
+                    P2 = new Point(0.5, 0.75),
+                    P3 = new Point(0.666, 1d)
+                };
+                var c2 = new BezierCurve
+                {
+                    P0 = new Point(0.666, 1d),
+                    P1 = new Point(0.7, 1d),
+                    P2 = new Point(0.9, 1d),
+                    P3 = new Point(1.00001, 1d),
+                    Next = c1.Id
+                };
+                Bezier.ClearAndSetCurves(new List<BezierCurve> { c1, c2 });
+            }
+        }
+
+
         private void CbOversampling_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var item = (ComboBoxItem) CbOversampling.SelectedItem;
@@ -461,18 +560,5 @@ namespace WaveShaper
             Player.Oversampling = oversampling;
         }
 
-        private void TxtR_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            float r;
-            if (!float.TryParse(TxtR.Text, out r))
-            {
-                TxtR.Background = Brushes.LightPink;
-            }
-            else
-            {
-                TxtR.Background = Brushes.White;
-                Player.R = r;
-            }
-        }
     }
 }
