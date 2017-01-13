@@ -241,6 +241,8 @@ namespace WaveShaper
                     func = BuildPiecewiseFunction(Rows, mirrored).Calculate;
                     break;
                 case ProcessingType.PiecewisePolynomial:
+                    foreach (var row in Rows)
+                        row.Mode = ProcessingType.PiecewisePolynomial;
                     func = BuildPiecewisePolynomial(Rows, mirrored).Calculate;
                     break;
                 case ProcessingType.Bezier:

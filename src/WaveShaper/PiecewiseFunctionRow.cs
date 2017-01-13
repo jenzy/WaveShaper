@@ -31,7 +31,7 @@ namespace WaveShaper
             Mode = mode;
         }
 
-        private ProcessingType Mode { get; }
+        public ProcessingType Mode { get; set; }
 
         public double? From
         {
