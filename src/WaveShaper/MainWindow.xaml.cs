@@ -497,6 +497,9 @@ namespace WaveShaper
                 P3 = new Point(1.00001, 0.828251933505092),
                 Prev = c3.Id
             };
+            c1.Next = c2.Id;
+            c2.Next = c3.Id;
+            c3.Next = c4.Id;
             Bezier.ClearAndSetCurves(new List<BezierCurve> {c1, c2, c3, c4});
         }
 
