@@ -3,17 +3,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using WaveShaper.Annotations;
+using JetBrains.Annotations;
 
-namespace WaveShaper
+namespace WaveShaper.Core.PiecewiseFunctions
 {
-    public enum Operator
-    {
-        [Description("<")] LessThan,
-
-        [Description("<=")] LessOrEqualThan
-    }
-
     public class PiecewiseFunctionRow : INotifyPropertyChanged
     {
         private Operator toOperator;
@@ -35,7 +28,7 @@ namespace WaveShaper
 
         public double? From
         {
-            get { return from; }
+            get => from;
             set
             {
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -48,7 +41,7 @@ namespace WaveShaper
 
         public Operator FromOperator
         {
-            get { return fromOperator; }
+            get => fromOperator;
             set
             {
                 if (value == fromOperator) return;
@@ -59,7 +52,7 @@ namespace WaveShaper
 
         public double? To
         {
-            get { return to; }
+            get => to;
             set
             {
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -72,7 +65,7 @@ namespace WaveShaper
 
         public Operator ToOperator
         {
-            get { return toOperator; }
+            get => toOperator;
             set
             {
                 if (value == toOperator) return;
@@ -83,7 +76,7 @@ namespace WaveShaper
 
         public string Expression
         {
-            get { return expression; }
+            get => expression;
             set
             {
                 if (value == expression) return;

@@ -9,8 +9,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Newtonsoft.Json;
-using WaveShaper.Annotations;
-using WaveShaper.Utilities;
+using JetBrains.Annotations;
+using WaveShaper.Core.Bezier;
+using WaveShaper.Core.Utilities;
+using WaveShaper.Wpf;
 
 namespace WaveShaper.Bezier
 {

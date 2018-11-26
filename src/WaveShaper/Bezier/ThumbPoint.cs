@@ -3,7 +3,9 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using WaveShaper.Utilities;
+using WaveShaper.Core.Bezier;
+using WaveShaper.Core.Utilities;
+using WaveShaper.Wpf;
 
 namespace WaveShaper.Bezier
 {

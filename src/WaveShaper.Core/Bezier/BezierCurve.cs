@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Windows;
 using MathNet.Numerics.RootFinding;
-using WaveShaper.Utilities;
+using WaveShaper.Core.Utilities;
 
-namespace WaveShaper.Bezier
+namespace WaveShaper.Core.Bezier
 {
     public class BezierCurve
     {

@@ -6,21 +6,24 @@
         xmlns:local="clr-namespace:WaveShaper"
         xmlns:controls="clr-namespace:WaveShaper.Controls"
         xmlns:bezier="clr-namespace:WaveShaper.Bezier"
-        xmlns:utils="clr-namespace:WaveShaper.Utilities"
         xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:utilities="clr-namespace:WaveShaper.Core.Utilities;assembly=WaveShaper.Core"
+        xmlns:core="clr-namespace:WaveShaper.Core;assembly=WaveShaper.Core"
+        xmlns:piecewiseFunctions="clr-namespace:WaveShaper.Core.PiecewiseFunctions;assembly=WaveShaper.Core"
+        xmlns:wpf="clr-namespace:WaveShaper.Wpf"
         mc:Ignorable="d"
         Title="WaveShaper" Height="600" Width="900" 
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Window.Resources>
-        <ObjectDataProvider x:Key="DpProcessingTypes" MethodName="AllValuesForDdl" ObjectType="utils:EnumUtil">
+        <ObjectDataProvider x:Key="DpProcessingTypes" MethodName="AllValuesForDdl" ObjectType="utilities:EnumUtil">
             <ObjectDataProvider.MethodParameters>
-                <x:TypeExtension TypeName="local:ProcessingType" />
+                <x:TypeExtension TypeName="core:ProcessingType" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
-        <ObjectDataProvider x:Key="DpOperator" MethodName="AllValuesForDdl" ObjectType="utils:EnumUtil">
+        <ObjectDataProvider x:Key="DpOperator" MethodName="AllValuesForDdl" ObjectType="utilities:EnumUtil">
             <ObjectDataProvider.MethodParameters>
-                <x:TypeExtension TypeName="local:Operator" />
+                <x:TypeExtension TypeName="piecewiseFunctions:Operator" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </Window.Resources>
@@ -50,7 +53,7 @@
                           Content="_Unipolar mode" IsChecked="True" IsEnabled="False"/>
                     <Button x:Name="BtnPresets" Content="Presets ▾" HorizontalAlignment="Right" Width="60" Margin="10,0,0,0" IsEnabled="False" >
                         <i:Interaction.Behaviors>
-                            <utils:DropDownButtonBehavior/>
+                            <wpf:DropDownButtonBehavior/>
                         </i:Interaction.Behaviors>
                     </Button>
                 </DockPanel>

@@ -1,6 +1,6 @@
 ﻿using NAudio.Wave;
 
-namespace WaveShaper.Shaping
+namespace WaveShaper.Core.Shaping
 {
     public class ArraySampleProvider : WaveProvider32
     {

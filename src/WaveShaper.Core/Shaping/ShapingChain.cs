@@ -1,7 +1,7 @@
 ﻿using System;
 using NAudio.Wave;
 
-namespace WaveShaper.Shaping
+namespace WaveShaper.Core.Shaping
 {
     public class ShapingChain
     {
@@ -23,7 +23,7 @@ namespace WaveShaper.Shaping
 
         public int OverSampling
         {
-            get { return overSampling; }
+            get => overSampling;
             set
             {
                 if (overSampling == value)
@@ -36,7 +36,7 @@ namespace WaveShaper.Shaping
 
         public float R
         {
-            get { return r; }
+            get => r;
             set
             {
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -51,7 +51,7 @@ namespace WaveShaper.Shaping
         private void InitOverSampling(int oversampling, float rr)
         {
             if (oversampling <= 0)
-                throw new ArgumentOutOfRangeException(nameof(oversampling), oversampling, @"Oversampling cannot be negative 0.");
+                throw new ArgumentOutOfRangeException(nameof(oversampling), oversampling, @"Oversampling cannot be negative or 0.");
 
             if (oversampling == 1)
             {
@@ -74,6 +74,5 @@ namespace WaveShaper.Shaping
                 Output = downsampler.ToSampleProvider();
             }
         }
-
     }
 }

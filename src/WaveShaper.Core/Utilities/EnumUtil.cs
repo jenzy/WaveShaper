@@ -4,9 +4,9 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using WaveShaper.Annotations;
+using JetBrains.Annotations;
 
-namespace WaveShaper.Utilities
+namespace WaveShaper.Core.Utilities
 {
     public class EnumUtil
     {
@@ -14,8 +14,7 @@ namespace WaveShaper.Utilities
 
         private static EnumMappings GetEnum(Type enumType)
         {
-            EnumMappings em;
-            if (!Enums.TryGetValue(enumType, out em))
+            if (!Enums.TryGetValue(enumType, out EnumMappings em))
             {
                 em = new EnumMappings(enumType);
                 Enums[enumType] = em;
@@ -49,15 +48,13 @@ namespace WaveShaper.Utilities
         {
             var em = GetEnum(@enum.GetType());
 
-            string displayString;
-            if (em.DisplayStrings.TryGetValue(@enum, out displayString))
+            if (em.DisplayStrings.TryGetValue(@enum, out string displayString))
                 return displayString;
 
             string stringEnum = @enum.ToString();
             var fi = @enum.GetType().GetField(stringEnum);
-            var attr = fi.GetCustomAttribute(typeof(DescriptionAttribute), false) as DescriptionAttribute;
 
-            displayString = attr != null ? attr.Description : stringEnum;
+            displayString = fi.GetCustomAttribute(typeof(DescriptionAttribute), false) is DescriptionAttribute attr ? attr.Description : stringEnum;
 
             em.DisplayStrings[@enum] = displayString;
 
@@ -101,21 +98,7 @@ namespace WaveShaper.Utilities
         private static IDictionary<TEnum, string> enumToValueString;
         private static IDictionary<string, TEnum> valueStringToEnum;
 
-        public static IEnumerable<TEnum> Values
-        {
-            get
-            {
-                // TODO contemplate
-                //if (values == null)
-                //{
-                //    EnumMappings em;
-                //    if (Enums.TryGetValue(typeof(TEnum), out em))
-                //        values = em.Values.Cast<TEnum>().ToList();
-                //}
-
-                return values ?? (values = Enum.GetValues(typeof(TEnum)).OfType<TEnum>().ToList());
-            }
-        }
+        public static IEnumerable<TEnum> Values => values ?? (values = Enum.GetValues(typeof(TEnum)).OfType<TEnum>().ToList());
 
         #region Mappings
 
@@ -131,12 +114,12 @@ namespace WaveShaper.Utilities
                     return valueStringToEnum;
 
                 valueStringToEnum = Values.Select(e => new
-                {
-                    Enum = e,
-                    Attr = e.GetType()
+                                          {
+                                              Enum = e,
+                                              Attr = e.GetType()
                                                       .GetField(e.ToString(CultureInfo.InvariantCulture))
                                                       .GetCustomAttribute(typeof(EnumStringValueAttribute), false) as EnumStringValueAttribute
-                })
+                                          })
                                           .Where(x => x.Attr != null)
                                           .ToDictionary(x => x.Attr.StringValue, x => x.Enum);
 
@@ -150,15 +133,13 @@ namespace WaveShaper.Utilities
 
         public static string ToDisplayString(TEnum @enum)
         {
-            string displayString;
-            if (DisplayStrings.TryGetValue(@enum, out displayString))
+            if (DisplayStrings.TryGetValue(@enum, out string displayString))
                 return displayString;
 
             string stringEnum = @enum.ToString(CultureInfo.InvariantCulture);
             var fi = @enum.GetType().GetField(stringEnum);
-            var attr = fi.GetCustomAttribute(typeof(DescriptionAttribute), false) as DescriptionAttribute;
 
-            displayString = attr != null ? attr.Description : stringEnum;
+            displayString = fi.GetCustomAttribute(typeof(DescriptionAttribute), false) is DescriptionAttribute attr ? attr.Description : stringEnum;
 
             DisplayStrings[@enum] = displayString;
 
@@ -172,15 +153,13 @@ namespace WaveShaper.Utilities
 
         public static string ToValueString(TEnum @enum)
         {
-            string valueString;
-            if (ValueStrings.TryGetValue(@enum, out valueString))
+            if (ValueStrings.TryGetValue(@enum, out string valueString))
                 return valueString;
 
             var stringEnum = @enum.ToString(CultureInfo.InvariantCulture);
             var fi = @enum.GetType().GetField(stringEnum);
-            var attr = fi.GetCustomAttribute(typeof(EnumStringValueAttribute), false) as EnumStringValueAttribute;
 
-            valueString = attr != null ? attr.StringValue : stringEnum;
+            valueString = fi.GetCustomAttribute(typeof(EnumStringValueAttribute), false) is EnumStringValueAttribute attr ? attr.StringValue : stringEnum;
 
             ValueStrings[@enum] = valueString;
 
@@ -198,8 +177,7 @@ namespace WaveShaper.Utilities
 
         public static TEnum FromValueString(string valueString)
         {
-            TEnum @enum;
-            if (!ValueStringToEnum.TryGetValue(valueString, out @enum))
+            if (!ValueStringToEnum.TryGetValue(valueString, out TEnum @enum))
                 throw new InvalidCastException(valueString + " is not a defined string value for enum type " + typeof(TEnum).FullName);
 
             return @enum;
@@ -207,8 +185,7 @@ namespace WaveShaper.Utilities
 
         public static TEnum? FromValueStringSafe(string valueString)
         {
-            TEnum @enum;
-            if (!ValueStringToEnum.TryGetValue(valueString, out @enum))
+            if (!ValueStringToEnum.TryGetValue(valueString, out TEnum @enum))
                 return null;
 
             return @enum;
@@ -227,7 +204,7 @@ namespace WaveShaper.Utilities
             var @enum = (TEnum)Enum.Parse(typeof(TEnum), enumValue);
 
             if (!IsDefined(@enum))
-                throw new ArgumentException(string.Format("{0} is not a defined value for enum type {1}", enumValue, typeof(TEnum).FullName));
+                throw new ArgumentException($"{enumValue} is not a defined value for enum type {typeof(TEnum).FullName}");
 
             return @enum;
         }
@@ -274,25 +251,4 @@ namespace WaveShaper.Utilities
             this.StringValue = stringValue;
         }
     }
-
-    //public static class EnumUtility
-    //{
-    //    // Might want to return a named type, this is a lazy example (which does work though)
-    //    public static object[] GetValuesAndDescriptions(Type enumType)
-    //    {
-    //        var values = Enum.GetValues(enumType).Cast<object>();
-    //        var valuesAndDescriptions = from value in values
-    //                                    select new
-    //                                    {
-    //                                        Value = value,
-    //                                        Description = value.GetType()
-    //                                                .GetMember(value.ToString())[0]
-    //                                                .GetCustomAttributes(true)
-    //                                                .OfType<DescriptionAttribute>()
-    //                                                .First()
-    //                                                .Description
-    //                                    };
-    //        return valuesAndDescriptions.ToArray();
-    //    }
-    //}
 }

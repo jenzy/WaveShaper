@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace WaveShaper.Utilities
+namespace WaveShaper.Wpf
 {
     public class WaitCursor : IDisposable
     {

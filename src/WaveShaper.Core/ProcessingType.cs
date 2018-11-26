@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace WaveShaper
+namespace WaveShaper.Core
 {
     public enum ProcessingType
     {

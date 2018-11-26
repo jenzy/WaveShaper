@@ -7,8 +7,10 @@ using System.Windows.Threading;
 using Microsoft.Win32;
 using NAudio.Utils;
 using NAudio.Wave;
-using WaveShaper.Shaping;
-using WaveShaper.Utilities;
+using WaveShaper.Core.Samples;
+using WaveShaper.Core.Shaping;
+using WaveShaper.Core.Utilities;
+using WaveShaper.Wpf;
 
 namespace WaveShaper.Controls
 {

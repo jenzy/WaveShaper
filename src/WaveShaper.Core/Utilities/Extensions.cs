@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace WaveShaper.Utilities
+namespace WaveShaper.Core.Utilities
 {
     public static class Extensions
     {
@@ -11,10 +11,18 @@ namespace WaveShaper.Utilities
 
             if (c.Compare(value, min) < 0)
                 return min;
+
             if (c.Compare(value, max) > 0)
                 return max;
 
             return value;
+        }
+
+        public static IEnumerable<T> AsEnumerable<T>(this Tuple<T, T, T> tuple)
+        {
+            yield return tuple.Item1;
+            yield return tuple.Item2;
+            yield return tuple.Item3;
         }
     }
 }

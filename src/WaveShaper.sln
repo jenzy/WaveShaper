@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.106
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WaveShaper", "WaveShaper\WaveShaper.csproj", "{7EF5A7EB-F67D-4FF1-86FC-71A717F420AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WaveShaper.Core", "WaveShaper.Core\WaveShaper.Core.csproj", "{CD2E6AB2-EBA4-4D56-8BB0-4D139E84A74E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +17,15 @@ Global
 		{7EF5A7EB-F67D-4FF1-86FC-71A717F420AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7EF5A7EB-F67D-4FF1-86FC-71A717F420AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7EF5A7EB-F67D-4FF1-86FC-71A717F420AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD2E6AB2-EBA4-4D56-8BB0-4D139E84A74E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD2E6AB2-EBA4-4D56-8BB0-4D139E84A74E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD2E6AB2-EBA4-4D56-8BB0-4D139E84A74E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD2E6AB2-EBA4-4D56-8BB0-4D139E84A74E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {219104E0-8478-4148-BA23-3155207CE808}
 	EndGlobalSection
 EndGlobal

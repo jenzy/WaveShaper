@@ -1,7 +1,7 @@
 ﻿using NAudio.Dsp;
 using NAudio.Wave;
 
-namespace WaveShaper.Shaping
+namespace WaveShaper.Core.Shaping
 {
     public class LowPassFilterProvider : WaveProvider32
     {
@@ -27,7 +27,7 @@ namespace WaveShaper.Shaping
 
             int channels = source.WaveFormat.Channels;
             for (int i = 0; i < samplesRead; i++)
-                buffer[offset + i] = filters[(i % channels)].Transform(buffer[offset + i]);
+                buffer[offset + i] = filters[i % channels].Transform(buffer[offset + i]);
 
             return samplesRead;
         }

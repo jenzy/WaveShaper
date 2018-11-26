@@ -1,9 +1,9 @@
 ﻿using System.Windows;
 using System.Windows.Media;
 
-namespace WaveShaper.Utilities
+namespace WaveShaper.Wpf
 {
-    internal static class WpfUtil
+    public static class WpfUtil
     {
         public static T FindParent<T>(DependencyObject child) where T : DependencyObject
         {
@@ -13,8 +13,7 @@ namespace WaveShaper.Utilities
                 if (parentObject == null)
                     return null;
 
-                T parent = parentObject as T;
-                if (parent != null)
+                if (parentObject is T parent)
                     return parent;
 
                 child = parentObject;

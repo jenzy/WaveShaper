@@ -12,9 +12,13 @@ using Jace;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
-using WaveShaper.Annotations;
+using JetBrains.Annotations;
 using WaveShaper.Bezier;
-using WaveShaper.Utilities;
+using WaveShaper.Core;
+using WaveShaper.Core.Bezier;
+using WaveShaper.Core.PiecewiseFunctions;
+using WaveShaper.Core.Shaping;
+using WaveShaper.Core.Utilities;
 using WaveShaper.Windows;
 
 namespace WaveShaper
@@ -235,7 +239,7 @@ namespace WaveShaper
             switch (mode)
             {
                 case ProcessingType.NoProcessing:
-                    func = ShapingSampleProvider.DefaultShapingFunction;
+                    func = ShapingProvider.DefaultShapingFunction;
                     break;
                 case ProcessingType.PiecewiseFunction:
                     func = BuildPiecewiseFunction(Rows, mirrored).Calculate;

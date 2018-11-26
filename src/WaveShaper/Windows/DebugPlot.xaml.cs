@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Windows;
 using OxyPlot;
-using WaveShaper.Annotations;
+using JetBrains.Annotations;
 
 namespace WaveShaper.Windows
 {

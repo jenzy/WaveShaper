@@ -38,6 +38,9 @@
     <Reference Include="Jace, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Jace.0.9.0\lib\netstandard1.6\Jace.dll</HintPath>
     </Reference>
+    <Reference Include="JetBrains.Annotations, Version=2018.2.1.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.2018.2.1\lib\net20\JetBrains.Annotations.dll</HintPath>
+    </Reference>
     <Reference Include="MathNet.Numerics, Version=4.7.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MathNet.Numerics.4.7.0\lib\net461\MathNet.Numerics.dll</HintPath>
     </Reference>
@@ -84,7 +87,6 @@
     <Compile Include="Bezier\BezierControl.xaml.cs">
       <DependentUpon>BezierControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Bezier\BezierCurve.cs" />
     <Compile Include="Bezier\BezierFigure.cs" />
     <Compile Include="Bezier\ActionCommand.cs" />
     <Compile Include="Bezier\ThumbPoint.cs" />
@@ -92,30 +94,15 @@
       <DependentUpon>Player.xaml</DependentUpon>
     </Compile>
     <Compile Include="CustomCommands.cs" />
-    <Compile Include="PiecewiseFunctionRow.cs" />
-    <Compile Include="PiecewiseFunction.cs" />
-    <Compile Include="ProcessingType.cs" />
-    <Compile Include="Properties\Annotations.cs" />
-    <Compile Include="Shaping\ArraySampleProvider.cs" />
-    <Compile Include="Shaping\LowPassFilterProvider.cs" />
-    <Compile Include="Shaping\ShapingChain.cs" />
-    <Compile Include="ShapingSampleProvider.cs" />
-    <Compile Include="Shaping\ShapingProvider.cs" />
-    <Compile Include="Utilities\DropDownButtonBehaviour.cs" />
-    <Compile Include="Utilities\EnumUtil.cs" />
-    <Compile Include="Utilities\Extensions.cs" />
-    <Compile Include="Utilities\PointExtensions.cs" />
-    <Compile Include="Utilities\TupleExtensions.cs" />
-    <Compile Include="Utilities\WaitCursor.cs" />
-    <Compile Include="Utilities\WpfEnumDisplayConverter.cs" />
-    <Compile Include="Utilities\WpfUtil.cs" />
-    <Compile Include="WaveSample.cs" />
+    <Compile Include="Wpf\DropDownButtonBehaviour.cs" />
     <Compile Include="Windows\DebugPlot.xaml.cs">
       <DependentUpon>DebugPlot.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\EffectPreview.xaml.cs">
       <DependentUpon>EffectPreview.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Wpf\WaitCursor.cs" />
+    <Compile Include="Wpf\WpfUtil.cs" />
     <Page Include="Bezier\BezierControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -172,6 +159,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WaveShaper.Core\WaveShaper.Core.csproj">
+      <Project>{cd2e6ab2-eba4-4d56-8bb0-4d139e84a74e}</Project>
+      <Name>WaveShaper.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

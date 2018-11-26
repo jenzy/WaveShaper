@@ -1,7 +1,7 @@
 ﻿using System;
 using NAudio.Wave;
 
-namespace WaveShaper.Shaping
+namespace WaveShaper.Core.Shaping
 {
     public class ShapingProvider : WaveProvider32
     {
@@ -16,7 +16,7 @@ namespace WaveShaper.Shaping
 
         public ISampleProvider Input
         {
-            get { return input; }
+            get => input;
             set
             {
                 input = value;
