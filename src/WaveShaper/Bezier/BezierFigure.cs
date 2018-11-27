@@ -29,7 +29,7 @@ namespace WaveShaper.Bezier
         /// </summary>
         public Point StartPoint
         {
-            get { return (Point)GetValue(StartPointProperty); }
+            get => (Point)GetValue(StartPointProperty);
             set
             {
                 SetValue(StartPointProperty, value);
@@ -59,7 +59,7 @@ namespace WaveShaper.Bezier
         /// </summary>
         public Point EndPoint
         {
-            get { return (Point)GetValue(EndPointProperty); }
+            get => (Point)GetValue(EndPointProperty);
             set
             {
                 SetValue(EndPointProperty, value);
@@ -83,8 +83,8 @@ namespace WaveShaper.Bezier
         /// </summary>
         public Point StartBezierPoint
         {
-            get { return (Point)GetValue(StartBezierPointProperty); }
-            set { SetValue(StartBezierPointProperty, value); }
+            get => (Point)GetValue(StartBezierPointProperty);
+            set => SetValue(StartBezierPointProperty, value);
         }
         #endregion
 
@@ -106,14 +106,14 @@ namespace WaveShaper.Bezier
         /// </summary>
         public Point EndBezierPoint
         {
-            get { return (Point)GetValue(EndBezierPointProperty); }
-            set { SetValue(EndBezierPointProperty, value); }
+            get => (Point)GetValue(EndBezierPointProperty);
+            set => SetValue(EndBezierPointProperty, value);
         }
         #endregion
 
         public BezierFigure PreviousFigure
         {
-            get { return previousFigure; }
+            get => previousFigure;
             set
             {
                 // ReSharper disable once PossibleUnintendedReferenceComparison
@@ -127,7 +127,7 @@ namespace WaveShaper.Bezier
 
         public BezierFigure NextFigure
         {
-            get { return nextFigure; }
+            get => nextFigure;
             set
             {
                 // ReSharper disable once PossibleUnintendedReferenceComparison

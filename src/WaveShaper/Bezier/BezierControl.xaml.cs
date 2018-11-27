@@ -10,8 +10,8 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using Newtonsoft.Json;
 using JetBrains.Annotations;
+using WaveShaper.Commands;
 using WaveShaper.Core.Bezier;
-using WaveShaper.Core.Utilities;
 using WaveShaper.Wpf;
 
 namespace WaveShaper.Bezier
@@ -62,7 +62,7 @@ namespace WaveShaper.Bezier
 
         public string CurrentMousePosition
         {
-            get { return currentMousePosition; }
+            get => currentMousePosition;
             set
             {
                 if (value == currentMousePosition) return;
@@ -130,7 +130,7 @@ namespace WaveShaper.Bezier
 
         private void AddCanvasText(string text, Point normalisedPoint)
         {
-            var tb = new TextBlock() {Text = text, };
+            var tb = new TextBlock {Text = text, };
             Canvas.Children.Add(tb);
 
             var p = ConvertPointToCanvas(normalisedPoint);
@@ -252,7 +252,7 @@ namespace WaveShaper.Bezier
             if (saveCurrentState)
                 SaveStateToStack();
 
-            Dictionary<Guid, BezierFigure> newFigures = curves.Select(ConvertCurveToFigure).ToDictionary(f => f.Id, f => f);
+            var newFigures = curves.Select(ConvertCurveToFigure).ToDictionary(f => f.Id, f => f);
 
             foreach (var bf in bezierFigures.ToArray())
                 RemoveFigure(bf);

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace WaveShaper.Bezier
+namespace WaveShaper.Commands
 {
     public class ActionCommand : ICommand
     {

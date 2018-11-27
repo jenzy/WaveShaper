@@ -12,6 +12,7 @@
         xmlns:core="clr-namespace:WaveShaper.Core;assembly=WaveShaper.Core"
         xmlns:piecewiseFunctions="clr-namespace:WaveShaper.Core.PiecewiseFunctions;assembly=WaveShaper.Core"
         xmlns:wpf="clr-namespace:WaveShaper.Wpf"
+        xmlns:commands="clr-namespace:WaveShaper.Commands"
         mc:Ignorable="d"
         Title="WaveShaper" Height="600" Width="900" 
         DataContext="{Binding RelativeSource={RelativeSource Self}}">
@@ -28,10 +29,10 @@
         </ObjectDataProvider>
     </Window.Resources>
     <Window.CommandBindings>
-        <CommandBinding Command="{x:Static local:CustomCommands+Presets.Identity}" Executed="PresetIdentity_OnExecuted" />
-        <CommandBinding Command="{x:Static local:CustomCommands+Presets.SoftClip1}" Executed="PresetSoftClip1_OnExecuted" />
-        <CommandBinding Command="{x:Static local:CustomCommands+Presets.SoftClip2}" Executed="PresetSoftClip2_OnExecuted" />
-        <CommandBinding Command="{x:Static local:CustomCommands+Presets.HardClip}" Executed="PresetHardClip_OnExecuted" />
+        <CommandBinding Command="{x:Static commands:CustomCommands+Presets.Identity}" Executed="PresetIdentity_OnExecuted" />
+        <CommandBinding Command="{x:Static commands:CustomCommands+Presets.SoftClip1}" Executed="PresetSoftClip1_OnExecuted" />
+        <CommandBinding Command="{x:Static commands:CustomCommands+Presets.SoftClip2}" Executed="PresetSoftClip2_OnExecuted" />
+        <CommandBinding Command="{x:Static commands:CustomCommands+Presets.HardClip}" Executed="PresetHardClip_OnExecuted" />
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Command="{Binding ElementName=Bezier, Path=UndoCommand}" Key="Z" Modifiers="Control"></KeyBinding>

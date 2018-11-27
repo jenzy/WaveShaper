@@ -1,4 +1,4 @@
-﻿<Window x:Class="WaveShaper.Windows.DebugPlot"
+﻿<Window x:Class="WaveShaper.Controls.EffectPreview"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,7 +6,7 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="EffectPreview" Height="600" Width="600">
+        Title="EffectPreview" Height="300" Width="800">
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <oxy:PlotView Model="{Binding PlotModel}" 
                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch"

@@ -124,5 +124,4 @@
                  Text="{Binding CurrentMousePosition}" MaxWidth="50"/>
     </DockPanel>
   </Grid>
-
 </UserControl>

@@ -2,12 +2,12 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using JetBrains.Annotations;
 using OxyPlot;
 using OxyPlot.Series;
-using JetBrains.Annotations;
 using WaveShaper.Core.PiecewiseFunctions;
 
-namespace WaveShaper.Windows
+namespace WaveShaper.Controls
 {
     /// <summary>
     /// Interaction logic for EffectPreview.xaml
@@ -21,12 +21,12 @@ namespace WaveShaper.Windows
         {
             this.shapingFunction = shapingFunction;
             InitializeComponent();
-            Plot(shapingFunction);
+            Plot();
         }
 
         public PlotModel PlotModel
         {
-            get { return plotModel; }
+            get => plotModel;
             set
             {
                 if (Equals(value, plotModel)) return;
@@ -35,7 +35,7 @@ namespace WaveShaper.Windows
             }
         }
 
-        private void Plot(Func<double, double> shapingFunct)
+        private void Plot()
         {
             try
             {
@@ -46,7 +46,7 @@ namespace WaveShaper.Windows
 
                 PlotModel.Series.Clear();
                 PlotModel.Series.Add(new FunctionSeries(func, from, to, steps, "s(t)") {Color = OxyColor.FromRgb(0, 0, 255)});
-                PlotModel.Series.Add(new FunctionSeries(x => shapingFunct(func(x)), from, to, steps, "f(s(t))") { Color = OxyColor.FromRgb(255, 0, 0) });
+                PlotModel.Series.Add(new FunctionSeries(x => shapingFunction(func(x)), from, to, steps, "f(s(t))") { Color = OxyColor.FromRgb(255, 0, 0) });
                 PlotModel.InvalidatePlot(true);
             }
             catch (PiecewiseFunctionInputOutOfRange)
@@ -67,6 +67,5 @@ namespace WaveShaper.Windows
         }
 
         #endregion
-
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace WaveShaper
+namespace WaveShaper.Commands
 {
     public static class CustomCommands
     {

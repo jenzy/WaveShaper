@@ -4,7 +4,6 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using WaveShaper.Core.Bezier;
-using WaveShaper.Core.Utilities;
 using WaveShaper.Wpf;
 
 namespace WaveShaper.Bezier
@@ -34,8 +33,8 @@ namespace WaveShaper.Bezier
         /// </summary>
         public Point Point
         {
-            get { return (Point)GetValue(PointProperty); }
-            set { SetValue(PointProperty, value); }
+            get => (Point)GetValue(PointProperty);
+            set => SetValue(PointProperty, value);
         }
 
         #endregion
@@ -80,9 +79,10 @@ namespace WaveShaper.Bezier
 
         private void OnDragDelta(object sender, DragDeltaEventArgs e)
         {
+            // Restrict left-most and right-most thumbpoint movement to y-axis only.
             double newX = this.Point.X + e.HorizontalChange;
-            if ((Type == ThumbPointType.P0 && BezierFigure?.PreviousFigure == null)
-                || (Type == ThumbPointType.P3 && BezierFigure?.NextFigure == null))
+            if (Type == ThumbPointType.P0 && BezierFigure?.PreviousFigure == null
+                || Type == ThumbPointType.P3 && BezierFigure?.NextFigure == null)
             {
                 newX = this.Point.X;
             }

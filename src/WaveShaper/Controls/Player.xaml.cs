@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,7 +10,6 @@ using NAudio.Utils;
 using NAudio.Wave;
 using WaveShaper.Core.Samples;
 using WaveShaper.Core.Shaping;
-using WaveShaper.Core.Utilities;
 using WaveShaper.Wpf;
 
 namespace WaveShaper.Controls
@@ -22,7 +22,6 @@ namespace WaveShaper.Controls
         private WaveSample inputSamples;
         private string currentFilename;
         private IWavePlayer waveOut;
-        //private ShapingSampleProvider samplesProvider;
         private Func<double, double> shapingFunction;
         private int oversampling = 1;
         private float r = 1f;
@@ -43,7 +42,7 @@ namespace WaveShaper.Controls
 
         public Func<double, double> ShapingFunction
         {
-            get { return Chain?.Shaper.ShapingFunction ?? shapingFunction ?? ShapingProvider.DefaultShapingFunction; }
+            get => Chain?.Shaper.ShapingFunction ?? shapingFunction ?? ShapingProvider.DefaultShapingFunction;
             set
             {
                 shapingFunction = value;
@@ -122,7 +121,7 @@ namespace WaveShaper.Controls
                 LblFileTitle.Content = openFileDialog.FileName;
                 SetLabelTime(TimeSpan.Zero, inputSamples.TimeSpanLength);
 
-                Chain = new ShapingChain(samples, afr.WaveFormat, shapingFunction) {OverSampling = oversampling, R = r};
+                Chain = new ShapingChain(samples, afr.WaveFormat, shapingFunction) { OverSampling = oversampling, R = r };
 
                 waveOut = new WaveOut { NumberOfBuffers = 3 };
                 waveOut.PlaybackStopped += WaveOutOnPlaybackStopped;
@@ -171,7 +170,8 @@ namespace WaveShaper.Controls
 
             BtnStop_OnClick(BtnStop, e);
 
-            SaveFileDialog saveFileDialog = new SaveFileDialog
+            Debug.Assert(currentFilename != null, nameof(currentFilename) + " != null");
+            var saveFileDialog = new SaveFileDialog
             {
                 FileName = Path.GetFileNameWithoutExtension(currentFilename),
                 DefaultExt = Path.GetExtension(currentFilename),
@@ -238,6 +238,5 @@ namespace WaveShaper.Controls
 
             LblTime.Content = $"{current:mm\\:ss} / {total:mm\\:ss}";
         }
-       
     }
 }

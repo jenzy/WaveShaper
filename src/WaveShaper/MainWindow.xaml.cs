@@ -13,13 +13,13 @@ using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
 using JetBrains.Annotations;
-using WaveShaper.Bezier;
+using WaveShaper.Commands;
+using WaveShaper.Controls;
 using WaveShaper.Core;
 using WaveShaper.Core.Bezier;
 using WaveShaper.Core.PiecewiseFunctions;
 using WaveShaper.Core.Shaping;
 using WaveShaper.Core.Utilities;
-using WaveShaper.Windows;
 
 namespace WaveShaper
 {
@@ -92,7 +92,7 @@ namespace WaveShaper
 
         public ObservableCollection<PiecewiseFunctionRow> Rows
         {
-            get { return rows; }
+            get => rows;
             set
             {
                 if (Equals(value, rows)) return;
@@ -103,7 +103,7 @@ namespace WaveShaper
 
         public PlotModel ShapingFunctionPlot
         {
-            get { return shapingFunctionPlot; }
+            get => shapingFunctionPlot;
             set
             {
                 if (Equals(value, shapingFunctionPlot)) return;
@@ -120,8 +120,7 @@ namespace WaveShaper
             var previousType = (ProcessingType) e.RemovedItems.Cast<EnumUtil.EnumListItem>().Single().Value;
             var newType = (ProcessingType) e.AddedItems.Cast<EnumUtil.EnumListItem>().Single().Value;
 
-            bool mirroredNew;
-            if (!mirroredPerMode.TryGetValue(newType, out mirroredNew))
+            if (!mirroredPerMode.TryGetValue(newType, out bool mirroredNew))
                 mirroredNew = true;
             mirroredPerMode[previousType] = CbMirrored.IsChecked.HasValue && CbMirrored.IsChecked.Value;
 
@@ -264,9 +263,12 @@ namespace WaveShaper
             var engine = new CalculationEngine();
             foreach (var row in rows)
             {
-                var pieceFunction = (Func<double, double>) engine.Formula(row.Expression.Replace("pi", Math.PI.ToString(CultureInfo.InvariantCulture)))
-                                                            .Parameter("x", DataType.FloatingPoint)
-                                                            .Result(DataType.FloatingPoint).Build();
+                var pieceFunction = (Func<double, double>)
+                    engine
+                        .Formula(row.Expression.Replace("pi", Math.PI.ToString(CultureInfo.InvariantCulture)))
+                        .Parameter("x", DataType.FloatingPoint)
+                        .Result(DataType.FloatingPoint)
+                        .Build();
 
                 if (mirrored)
                 {
@@ -287,7 +289,6 @@ namespace WaveShaper
 
             function.AddPiece(Piece<double>.DefaultPiece);
 
-            //function.Preprocess = x => x.Clamp(-1, 1);
             return function;
         }
 
@@ -318,7 +319,6 @@ namespace WaveShaper
 
             function.AddPiece(Piece<double>.DefaultPiece);
 
-            //function.Preprocess = x => x.Clamp(-1, 1);
             return function;
         }
 
@@ -343,7 +343,6 @@ namespace WaveShaper
 
             function.AddPiece(Piece<double>.DefaultPiece);
 
-            //function.Preprocess = x => x.Clamp(-1, 1);
             return function;
         }
 
@@ -561,13 +560,11 @@ namespace WaveShaper
             }
         }
 
-
         private void CbOversampling_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var item = (ComboBoxItem) CbOversampling.SelectedItem;
             int oversampling = int.Parse((string) item.Tag);
             Player.Oversampling = oversampling;
         }
-
     }
 }

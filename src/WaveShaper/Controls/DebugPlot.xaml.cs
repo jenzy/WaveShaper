@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using OxyPlot;
 using JetBrains.Annotations;
+using OxyPlot;
 
-namespace WaveShaper.Windows
+namespace WaveShaper.Controls
 {
     /// <summary>
     /// Interaction logic for EffectPreview.xaml
@@ -21,7 +21,7 @@ namespace WaveShaper.Windows
 
         public PlotModel PlotModel
         {
-            get { return plotModel; }
+            get => plotModel;
             set
             {
                 if (Equals(value, plotModel)) return;
