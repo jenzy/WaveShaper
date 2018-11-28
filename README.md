@@ -29,13 +29,13 @@ An example of a shaping function. The input signal (left) is transformed by a so
 
 ## Screenshots
 
-The waveshaper and Bezier curves manipulation.
+The waveshaper and Bezier curves manipulation.  
 ![The waveshaper](img/screen-all.png)
 
-Piecewise polynomial input.
+Piecewise polynomial input.  
 ![Piecewise polynomial input](img/screen-poly.png)
 
-Piecewise function input.
+Piecewise function input.  
 ![Piecewise polynomial input](img/screen-fun.png)
 
 ## Libraries
